@@ -1,0 +1,20 @@
+---
+name: React Frontend Standards
+description: Modern React patterns for UI/board/video
+globs:
+  - src/**/*.tsx
+  - src/**/*.jsx
+---
+
+# React / TypeScript Rules
+
+- Functional components only + hooks
+- TypeScript strict: Interfaces for props/state
+- Tailwind CSS for styling (utility-first)
+- Board: SVG or Konva.js for draggable pawns/tiles
+- Actions: Modal reveal for prompts, timer optional
+- Consent UI: Prominent skip/safe-word button
+- Video: Grid layout around board, responsive
+
+Use useContext or Zustand for light global state (outside boardgame.io).
+Memoize expensive components (React.memo, useMemo).
