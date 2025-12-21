@@ -1,0 +1,25 @@
+---
+name: boardgame.io Guidelines
+description: Rules for implementing game logic with boardgame.io
+globs:
+  - src/game/**/*.ts
+  - src/game/**/*.tsx
+alwaysApply: false
+---
+
+# boardgame.io Best Practices
+
+- Define game in a single file (e.g., src/game/game.ts) with setup, moves, turn order
+- Moves: rollDice, movePawn(position), drawAction(intensity)
+- Use phases for intensity escalation
+- Client: React components for Board, pawns (SVG/Canvas/Konva.js)
+- Server: Minimal Node.js for matchmaking/rooms
+- Sync video state separately via WebRTC (not in game state)
+
+Example move:
+function rollDice(G, ctx) {
+  const roll = ctx.random.D6();
+  return { ...G, lastRoll: roll };
+}
+
+Prefer immutable updates.
