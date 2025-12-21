@@ -1,0 +1,33 @@
+---
+name: Project Overview
+description: High-level context for the entire kink-themed multiplayer board game web app
+alwaysApply: true
+---
+
+# Blitzed Out Copycat – Open-Source Kink Board Game Web App
+
+This is an open-source, privacy-focused, turn-based multiplayer web app inspired by BlitzedOut.com.
+
+## Key Features
+- Turn-based board game using boardgame.io (handles rooms, turns, moves, sync)
+- Customizable action tiles/cards (user-editable decks with intensity levels: mild/medium/intense)
+- Private rooms with shareable links (anonymous play)
+- Integrated webcam/video chat via WebRTC (P2P with simple-peer or PeerJS) for remote play/reactions
+- Consent tools: Skip buttons, boundary presets, safe word pause
+- Adult/kink theme: Prompts are consensual, exciting, user-customizable dares/challenges
+
+## Tech Stack
+- Frontend: React 18+ (functional components, hooks), TypeScript, Vite/Tailwind optional
+- Game Logic: boardgame.io (define games with moves like rollDice, movePawn, drawAction)
+- Multiplayer Sync: boardgame.io server (Node.js)
+- Video Chat: WebRTC with simple-peer (P2P mesh, signaling via boardgame.io sockets)
+- Backend: Node.js/Express (lightweight, for lobby if needed)
+- Storage: localStorage or optional Firebase/Supabase for saved boards (keep open-source)
+
+## Core Principles
+- Privacy first: No logging of actions/prompts, age-gate (18+ confirmation)
+- Consent: Always include skip/options in UI for actions
+- Open-Source: Clean, modular, commented code
+- Performance: Lightweight, no heavy deps
+
+Always think step-by-step: Plan changes, reference existing files, test mentally.
