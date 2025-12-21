@@ -1,0 +1,16 @@
+---
+name: Privacy & Consent Emphasis
+description: Critical for adult theme – always prioritize
+alwaysApply: true
+---
+
+# Privacy and Consent Rules
+
+- Age-gate: 18+ confirmation on entry
+- No storage of user prompts/actions without explicit opt-in
+- All dares consensual: Phrases like "with consent", "willing player"
+- UI: Skip button on every action, safe word triggers game pause
+- WebRTC: Optional cam, private P2P only
+- Open-Source: No telemetry, clear comments on sensitive code
+
+When generating prompts: Keep exciting but safe/respectful.
