@@ -1,0 +1,25 @@
+--
+name: WebRTC Webcam Integration
+description: Guidelines for P2P video chat with webcam
+globs:
+  - src/components/Video*.tsx
+  - src/hooks/useVideo*.ts
+---
+
+# WebRTC / simple-peer Rules
+
+- Use simple-peer (MIT open-source) for P2P mesh (no server relay for privacy)
+- Signaling: Reuse boardgame.io sockets (emit 'signal' events in room)
+- On room join: Request getUserMedia for local stream
+- Create peers for each other player
+- Display <video> grids (mute own, autoplay remote)
+- Features: Mute/unmute toggles, optional screen share, hide if inactive
+- Privacy: Streams only in private rooms, destroy on leave
+- Fallback: Text chat if cam denied
+
+Example:
+import SimplePeer from 'simple-peer';
+
+const peer = new SimplePeer({ initiator: isHost, stream: localStream });
+peer.on('signal', data => socket.emit('webrtc-signal', { to: playerId, data }));
+peer.on('stream', addRemoteStream);
