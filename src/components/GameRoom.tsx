@@ -29,7 +29,9 @@ const createClient = (numPlayers: number, isSolo: boolean) => {
       numPlayers: 1, // Critical for solo
       // Do NOT pass multiplayer prop for true solo
     });
-    console.log("[createClient] Solo client created (no multiplayer transport)");
+    console.log(
+      "[createClient] Solo client created (no multiplayer transport)"
+    );
     return client;
   } else {
     // MULTIPLAYER MODE: Use Local() for local testing
@@ -39,7 +41,9 @@ const createClient = (numPlayers: number, isSolo: boolean) => {
       multiplayer: Local(),
       numPlayers: numPlayers,
     });
-    console.log("[createClient] Multiplayer client created with Local() transport");
+    console.log(
+      "[createClient] Multiplayer client created with Local() transport"
+    );
     return client;
   }
 };
