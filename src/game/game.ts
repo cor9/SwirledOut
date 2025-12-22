@@ -269,7 +269,8 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
 
     // CRITICAL FIX: Detect solo mode from matchID (since ctx.numPlayers is undefined)
     // If matchID contains "SOLO", force 1 player
-    const isSoloGame = ctx.matchID?.includes("SOLO") || 
+    const matchIDStr = typeof ctx.matchID === "string" ? ctx.matchID : String(ctx.matchID || "");
+    const isSoloGame = matchIDStr.includes("SOLO") || 
                        (typeof ctx.numPlayers === "number" && ctx.numPlayers === 1);
     
     const actualNumPlayers = isSoloGame ? 1 : playOrder.length;

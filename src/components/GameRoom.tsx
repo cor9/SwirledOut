@@ -24,7 +24,7 @@ const createClient = (numPlayers: number, matchID?: string) => {
     board: GameBoard,
     multiplayer: multiplayerConfig,
     numPlayers: numPlayers, // Explicitly set
-    matchID: matchID, // Pass matchID so game setup can detect solo mode
+    // Note: matchID is set when starting the client, not in constructor
   });
   
   console.log(
