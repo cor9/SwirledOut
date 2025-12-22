@@ -24,9 +24,10 @@ export default function Header({ showRoomInfo, roomId, onLogoClick }: HeaderProp
                   img.style.display = "none";
                 }}
               />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-pulse">
                 SwirledOut
               </h1>
+              <span className="text-xs text-purple-300 font-normal ml-2">Powered by boardgame.io</span>
             </div>
           </div>
           {showRoomInfo && roomId && (

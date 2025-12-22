@@ -71,7 +71,9 @@ export default function ActionModal({
                 intensityColors[action.intensity]
               }`}
             >
-              <span className="font-bold uppercase text-sm">{action.intensity}</span>
+              <span className="font-bold uppercase text-sm">
+                {action.intensity}
+              </span>
             </div>
             <div className={`text-2xl ${categoryColors[action.category]}`}>
               {categoryIcons[action.category]} {action.category}
@@ -79,15 +81,20 @@ export default function ActionModal({
           </div>
 
           <h2 className="text-3xl font-bold text-white mb-4">Your Action</h2>
-          <p className="text-2xl text-purple-200 font-medium mb-4">{action.text}</p>
+          <p className="text-2xl text-purple-200 font-medium mb-4">
+            {action.text}
+          </p>
 
           {/* Timer */}
           {timerEnabled && localTimer > 0 && (
             <div className="mb-4">
               <div className="bg-purple-900/30 border border-purple-500/50 rounded-lg p-3">
-                <div className="text-purple-300 text-sm mb-1">Time Remaining</div>
+                <div className="text-purple-300 text-sm mb-1">
+                  Time Remaining
+                </div>
                 <div className="text-4xl font-bold text-purple-200">
-                  {Math.floor(localTimer / 60)}:{(localTimer % 60).toString().padStart(2, "0")}
+                  {Math.floor(localTimer / 60)}:
+                  {(localTimer % 60).toString().padStart(2, "0")}
                 </div>
               </div>
             </div>

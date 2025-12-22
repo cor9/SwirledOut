@@ -9,7 +9,7 @@ SwirledOut is a turn-based multiplayer board game with customizable action cards
 ### 🎲 Dice System
 - **Roll**: Players roll 2 dice (2-12 total)
 - **Movement**: Move your pawn the rolled number of spaces
-- **Special Rolls**: 
+- **Special Rolls**:
   - Double 6 = Roll again
   - Double 1 = Draw punishment card
 

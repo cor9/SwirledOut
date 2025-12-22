@@ -1,8 +1,21 @@
 import { Game } from "boardgame.io";
 
 export type IntensityLevel = "mild" | "medium" | "intense";
-export type CardCategory = "truth" | "dare" | "challenge" | "punishment" | "reward" | "wild";
-export type TileType = "normal" | "action" | "punishment" | "reward" | "wild" | "start" | "finish";
+export type CardCategory =
+  | "truth"
+  | "dare"
+  | "challenge"
+  | "punishment"
+  | "reward"
+  | "wild";
+export type TileType =
+  | "normal"
+  | "action"
+  | "punishment"
+  | "reward"
+  | "wild"
+  | "start"
+  | "finish";
 
 export interface ActionCard {
   id: string;
@@ -56,31 +69,119 @@ export interface SwirledOutGameState {
 const createDefaultDecks = () => {
   const actionDeck: ActionCard[] = [
     // Truth cards
-    { id: "t1", text: "What's your biggest secret?", category: "truth", intensity: "mild" },
-    { id: "t2", text: "What's your wildest fantasy?", category: "truth", intensity: "medium" },
-    { id: "t3", text: "What's something you've never told anyone?", category: "truth", intensity: "intense" },
-    
+    {
+      id: "t1",
+      text: "What's your biggest secret?",
+      category: "truth",
+      intensity: "mild",
+    },
+    {
+      id: "t2",
+      text: "What's your wildest fantasy?",
+      category: "truth",
+      intensity: "medium",
+    },
+    {
+      id: "t3",
+      text: "What's something you've never told anyone?",
+      category: "truth",
+      intensity: "intense",
+    },
+
     // Dare cards
-    { id: "d1", text: "Dance for 30 seconds", category: "dare", intensity: "mild", timerSeconds: 30 },
-    { id: "d2", text: "Sing a song of your choice", category: "dare", intensity: "medium", timerSeconds: 60 },
-    { id: "d3", text: "Do your best impression of another player", category: "dare", intensity: "medium" },
-    { id: "d4", text: "Complete a physical challenge", category: "dare", intensity: "intense", timerSeconds: 120 },
-    
+    {
+      id: "d1",
+      text: "Dance for 30 seconds",
+      category: "dare",
+      intensity: "mild",
+      timerSeconds: 30,
+    },
+    {
+      id: "d2",
+      text: "Sing a song of your choice",
+      category: "dare",
+      intensity: "medium",
+      timerSeconds: 60,
+    },
+    {
+      id: "d3",
+      text: "Do your best impression of another player",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "d4",
+      text: "Complete a physical challenge",
+      category: "dare",
+      intensity: "intense",
+      timerSeconds: 120,
+    },
+
     // Challenge cards
-    { id: "c1", text: "Hold a pose for 1 minute", category: "challenge", intensity: "medium", timerSeconds: 60, punishment: "Do 10 push-ups" },
-    { id: "c2", text: "Answer 5 rapid-fire questions", category: "challenge", intensity: "medium", timerSeconds: 30 },
-    { id: "c3", text: "Complete a timed task", category: "challenge", intensity: "intense", timerSeconds: 90, punishment: "Draw a punishment card" },
-    
+    {
+      id: "c1",
+      text: "Hold a pose for 1 minute",
+      category: "challenge",
+      intensity: "medium",
+      timerSeconds: 60,
+      punishment: "Do 10 push-ups",
+    },
+    {
+      id: "c2",
+      text: "Answer 5 rapid-fire questions",
+      category: "challenge",
+      intensity: "medium",
+      timerSeconds: 30,
+    },
+    {
+      id: "c3",
+      text: "Complete a timed task",
+      category: "challenge",
+      intensity: "intense",
+      timerSeconds: 90,
+      punishment: "Draw a punishment card",
+    },
+
     // Wild cards
-    { id: "w1", text: "Choose your own adventure - truth or dare?", category: "wild", intensity: "mild" },
-    { id: "w2", text: "Create a challenge for yourself", category: "wild", intensity: "medium" },
+    {
+      id: "w1",
+      text: "Choose your own adventure - truth or dare?",
+      category: "wild",
+      intensity: "mild",
+    },
+    {
+      id: "w2",
+      text: "Create a challenge for yourself",
+      category: "wild",
+      intensity: "medium",
+    },
   ];
 
   const punishmentDeck: ActionCard[] = [
-    { id: "p1", text: "Skip your next turn", category: "punishment", intensity: "mild" },
-    { id: "p2", text: "Move back 3 spaces", category: "punishment", intensity: "medium" },
-    { id: "p3", text: "Draw another action card", category: "punishment", intensity: "medium" },
-    { id: "p4", text: "Complete an extra challenge", category: "punishment", intensity: "intense" },
+    {
+      id: "p1",
+      text: "Skip your next turn",
+      category: "punishment",
+      intensity: "mild",
+    },
+    {
+      id: "p2",
+      text: "Move back 3 spaces",
+      category: "punishment",
+      intensity: "medium",
+    },
+    {
+      id: "p3",
+      text: "Draw another action card",
+      category: "punishment",
+      intensity: "medium",
+    },
+    {
+      id: "p4",
+      text: "Complete an extra challenge",
+      category: "punishment",
+      intensity: "intense",
+    },
   ];
 
   return { actionDeck, punishmentDeck };
@@ -89,7 +190,7 @@ const createDefaultDecks = () => {
 // Create board tiles with special spaces
 const createBoardTiles = (boardSize: number): BoardTile[] => {
   const tiles: BoardTile[] = [];
-  
+
   for (let i = 0; i < boardSize; i++) {
     let type: TileType = "normal";
     let specialEffect: string | undefined;
@@ -104,7 +205,12 @@ const createBoardTiles = (boardSize: number): BoardTile[] => {
     }
     // Special tiles at intervals
     else if (i % 5 === 0) {
-      const specialTypes: TileType[] = ["action", "punishment", "reward", "wild"];
+      const specialTypes: TileType[] = [
+        "action",
+        "punishment",
+        "reward",
+        "wild",
+      ];
       type = specialTypes[(i / 5) % specialTypes.length];
       if (type === "punishment") {
         specialEffect = "Draw a punishment card";
@@ -196,25 +302,40 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
       const currentTile = gameState.boardTiles[newPosition];
       if (currentTile.type === "reward" && currentTile.specialEffect) {
         // Move forward 2 more spaces
-        const rewardPosition = Math.min(newPosition + 2, gameState.boardSize - 1);
+        const rewardPosition = Math.min(
+          newPosition + 2,
+          gameState.boardSize - 1
+        );
         gameState.players[ctx.currentPlayer].position = rewardPosition;
-      } else if (currentTile.type === "punishment" && currentTile.specialEffect) {
+      } else if (
+        currentTile.type === "punishment" &&
+        currentTile.specialEffect
+      ) {
         // Will draw punishment card after action
       }
     },
 
-    drawAction: (G, ctx, category?: CardCategory, intensity?: IntensityLevel) => {
+    drawAction: (
+      G,
+      ctx,
+      category?: CardCategory,
+      intensity?: IntensityLevel
+    ) => {
       const gameState = G as unknown as SwirledOutGameState;
       let availableCards = [...gameState.actionDeck];
 
       // Filter by category if specified
       if (category) {
-        availableCards = availableCards.filter((card) => card.category === category);
+        availableCards = availableCards.filter(
+          (card) => card.category === category
+        );
       }
 
       // Filter by intensity if specified
       if (intensity) {
-        availableCards = availableCards.filter((card) => card.intensity === intensity);
+        availableCards = availableCards.filter(
+          (card) => card.intensity === intensity
+        );
       }
 
       // If no cards match, use all cards
@@ -230,10 +351,11 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
 
       gameState.currentAction = drawnCard;
       gameState.phase = "action";
-      
+
       // Set timer if card has one or use default
       if (gameState.gameRules.timerEnabled) {
-        gameState.timerRemaining = drawnCard.timerSeconds || gameState.gameRules.defaultTimerSeconds;
+        gameState.timerRemaining =
+          drawnCard.timerSeconds || gameState.gameRules.defaultTimerSeconds;
       }
     },
 
@@ -244,8 +366,12 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
 
       // Award points/reward
       player.completedActions += 1;
-      player.score += gameState.currentAction.intensity === "mild" ? 1 : 
-                     gameState.currentAction.intensity === "medium" ? 2 : 3;
+      player.score +=
+        gameState.currentAction.intensity === "mild"
+          ? 1
+          : gameState.currentAction.intensity === "medium"
+          ? 2
+          : 3;
 
       // Apply reward if card has one
       if (gameState.currentAction.reward) {
@@ -267,15 +393,18 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
       if (!player || !gameState.currentAction) return;
 
       // Apply punishment if enabled
-      if (gameState.gameRules.punishmentOnSkip && gameState.currentAction.punishment) {
+      if (
+        gameState.gameRules.punishmentOnSkip &&
+        gameState.currentAction.punishment
+      ) {
         player.punishments += 1;
-        
+
         // Draw punishment card
         if (gameState.punishmentDeck.length > 0) {
           const punishmentIndices = gameState.punishmentDeck.map((_, i) => i);
           const shuffled = ctx.random.Shuffle(punishmentIndices);
           const punishmentCard = gameState.punishmentDeck[shuffled[0]];
-          
+
           // Apply punishment effect
           if (punishmentCard.text.includes("back")) {
             const newPos = Math.max(player.position - 3, 0);
@@ -316,7 +445,7 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
       const gameState = G as unknown as SwirledOutGameState;
       if (gameState.timerRemaining !== undefined) {
         gameState.timerRemaining = Math.max(0, seconds);
-        
+
         // Auto-fail if timer runs out
         if (gameState.timerRemaining === 0 && gameState.currentAction) {
           // Apply punishment for timeout

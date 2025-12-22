@@ -42,7 +42,7 @@ export default function GameBoard({
 
       // Check what type of tile we landed on
       const landedTile = G.boardTiles[newPosition];
-      
+
       // Draw action card when landing
       setTimeout(() => {
         if (moves.drawAction) {
@@ -115,89 +115,126 @@ export default function GameBoard({
 
   return (
     <div className="w-full">
-      {/* Game Info */}
-      <div className="mb-6 space-y-3">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-white">
-            {isMyTurn ? "🎲 Your Turn" : `Player ${ctx.currentPlayer + 1}'s Turn`}
-          </h2>
+      {/* Turn Indicator - Prominent */}
+      <div className={`mb-6 p-4 rounded-xl border-2 ${
+        isMyTurn 
+          ? "bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-purple-400 shadow-lg shadow-purple-500/50" 
+          : "bg-gray-800/50 border-gray-600"
+      }`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className={`text-3xl font-bold ${
+              isMyTurn ? "text-white" : "text-gray-400"
+            }`}>
+              {isMyTurn
+                ? "🎲 YOUR TURN - Take Action!"
+                : `⏳ Player ${ctx.currentPlayer + 1}'s Turn`}
+            </h2>
+            {isMyTurn && (
+              <p className="text-purple-200 text-sm mt-1">
+                Roll the dice to begin your turn
+              </p>
+            )}
+          </div>
           {G.lastRoll && (
-            <div className="bg-purple-600/20 border border-purple-500/50 rounded-lg px-4 py-2">
-              <div className="text-purple-200 text-sm">Rolled</div>
-              <span className="font-bold text-3xl text-purple-300">
+            <div className="bg-purple-600/20 border border-purple-500/50 rounded-lg px-6 py-3">
+              <div className="text-purple-200 text-xs uppercase tracking-wide">Rolled</div>
+              <span className="font-bold text-4xl text-purple-300 block">
                 {G.lastRoll}
               </span>
             </div>
           )}
         </div>
+      </div>
 
-        {/* Game Stats */}
-        <div className="grid grid-cols-3 gap-4 text-sm">
-          <div className="bg-gray-700/50 rounded-lg p-3">
-            <div className="text-gray-400">Board Size</div>
-            <div className="text-white font-bold">{G.boardSize} tiles</div>
-          </div>
-          <div className="bg-gray-700/50 rounded-lg p-3">
-            <div className="text-gray-400">Cards in Deck</div>
-            <div className="text-white font-bold">{G.actionDeck.length}</div>
-          </div>
-          <div className="bg-gray-700/50 rounded-lg p-3">
-            <div className="text-gray-400">Win Condition</div>
-            <div className="text-white font-bold capitalize">
-              {G.gameRules.winCondition.replace(/_/g, " ")}
-            </div>
+      {/* Game Stats */}
+      <div className="grid grid-cols-3 gap-4 text-sm mb-6">
+        <div className="bg-gray-700/50 rounded-lg p-3">
+          <div className="text-gray-400">Board Size</div>
+          <div className="text-white font-bold">{G.boardSize} tiles</div>
+        </div>
+        <div className="bg-gray-700/50 rounded-lg p-3">
+          <div className="text-gray-400">Cards in Deck</div>
+          <div className="text-white font-bold">{G.actionDeck.length}</div>
+        </div>
+        <div className="bg-gray-700/50 rounded-lg p-3">
+          <div className="text-gray-400">Win Condition</div>
+          <div className="text-white font-bold capitalize">
+            {G.gameRules.winCondition.replace(/_/g, " ")}
           </div>
         </div>
+      </div>
 
-        <div className="flex gap-3 flex-wrap">
-          {isMyTurn && G.phase === "playing" && !G.lastRoll && (
-            <button
-              onClick={handleRollDice}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-lg transition-all transform hover:scale-105 font-bold shadow-lg"
-            >
-              🎲 Roll Dice (2 dice)
-            </button>
-          )}
+      {/* Turn Controls - Prominent */}
+      <div className="mb-6">
+        {isMyTurn ? (
+          <div className="space-y-4">
+            {/* Roll Dice Button */}
+            {G.phase === "playing" && !G.lastRoll && (
+              <div className="bg-gray-800/50 rounded-xl p-6 border border-purple-500/30">
+                <h3 className="text-white font-semibold mb-4">Step 1: Roll the Dice</h3>
+                <button
+                  onClick={handleRollDice}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
+                >
+                  🎲 Roll Dice (2 dice = 2-12)
+                </button>
+              </div>
+            )}
 
-          {isMyTurn && G.lastRoll && G.phase === "playing" && (
-            <button
-              onClick={handleMove}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg transition-all transform hover:scale-105 font-bold shadow-lg"
-            >
-              Move {G.lastRoll} Spaces
-            </button>
-          )}
+            {/* Move Button */}
+            {G.lastRoll && G.phase === "playing" && (
+              <div className="bg-gray-800/50 rounded-xl p-6 border border-blue-500/30">
+                <h3 className="text-white font-semibold mb-4">Step 2: Move Your Pawn</h3>
+                <button
+                  onClick={handleMove}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
+                >
+                  👉 Move {G.lastRoll} Spaces
+                </button>
+              </div>
+            )}
 
-          {/* Category selection buttons (for wild tiles or manual selection) */}
-          {isMyTurn && G.phase === "playing" && !G.lastRoll && (
-            <div className="flex gap-2 flex-wrap">
-              <button
-                onClick={() => handleCategorySelect("truth")}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-              >
-                💭 Truth
-              </button>
-              <button
-                onClick={() => handleCategorySelect("dare")}
-                className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-              >
-                🎯 Dare
-              </button>
-              <button
-                onClick={() => handleCategorySelect("challenge")}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-              >
-                ⚡ Challenge
-              </button>
-              <button
-                onClick={() => setShowCardEditor(true)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-              >
-                ➕ Add Card
-              </button>
-            </div>
-          )}
-        </div>
+            {/* Category Selection (Optional) */}
+            {G.phase === "playing" && !G.lastRoll && (
+              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-600">
+                <h3 className="text-white font-semibold mb-3 text-sm">Or Choose a Category:</h3>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => handleCategorySelect("truth")}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                  >
+                    💭 Truth
+                  </button>
+                  <button
+                    onClick={() => handleCategorySelect("dare")}
+                    className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                  >
+                    🎯 Dare
+                  </button>
+                  <button
+                    onClick={() => handleCategorySelect("challenge")}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                  >
+                    ⚡ Challenge
+                  </button>
+                  <button
+                    onClick={() => setShowCardEditor(true)}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                  >
+                    ➕ Add Card
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-600 text-center">
+            <p className="text-gray-400 text-lg">
+              Waiting for Player {ctx.currentPlayer + 1} to take their turn...
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Board */}
@@ -266,7 +303,8 @@ export default function GameBoard({
                   strokeWidth="4"
                 >
                   <title>
-                    {player.name} - Position: {player.position} - Score: {player.score} - Completed: {player.completedActions}
+                    {player.name} - Position: {player.position} - Score:{" "}
+                    {player.score} - Completed: {player.completedActions}
                   </title>
                 </circle>
                 <text
@@ -312,11 +350,15 @@ export default function GameBoard({
                 {player.name}
               </p>
               <div className="mt-2 space-y-1 text-xs text-gray-400">
-                <div>Position: {player.position}/{G.boardSize - 1}</div>
+                <div>
+                  Position: {player.position}/{G.boardSize - 1}
+                </div>
                 <div>Score: {player.score}</div>
                 <div>Completed: {player.completedActions}</div>
                 {player.punishments > 0 && (
-                  <div className="text-red-400">Punishments: {player.punishments}</div>
+                  <div className="text-red-400">
+                    Punishments: {player.punishments}
+                  </div>
                 )}
               </div>
             </div>
@@ -362,7 +404,9 @@ export default function GameBoard({
       {G.phase === "finished" && G.winner && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 rounded-2xl p-8 max-w-md w-full border-2 border-purple-500/50 shadow-2xl text-center">
-            <h2 className="text-4xl font-bold text-white mb-4">🎉 Game Over!</h2>
+            <h2 className="text-4xl font-bold text-white mb-4">
+              🎉 Game Over!
+            </h2>
             <p className="text-2xl text-purple-200 mb-6">
               {G.players.find((p) => p.id === G.winner)?.name} Wins!
             </p>

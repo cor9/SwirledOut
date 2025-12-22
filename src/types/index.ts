@@ -1,6 +1,19 @@
 export type IntensityLevel = "mild" | "medium" | "intense";
-export type CardCategory = "truth" | "dare" | "challenge" | "punishment" | "reward" | "wild";
-export type TileType = "normal" | "action" | "punishment" | "reward" | "wild" | "start" | "finish";
+export type CardCategory =
+  | "truth"
+  | "dare"
+  | "challenge"
+  | "punishment"
+  | "reward"
+  | "wild";
+export type TileType =
+  | "normal"
+  | "action"
+  | "punishment"
+  | "reward"
+  | "wild"
+  | "start"
+  | "finish";
 
 export interface ActionCard {
   id: string;
