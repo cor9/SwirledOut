@@ -1,0 +1,51 @@
+{
+  "name": "swirledout",
+  "version": "1.0.0",
+  "description": "Multiplayer online kink boardgame",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "server": "tsx src/server/index.ts",
+    "start": "npm run build && npm run server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cor9/SwirledOut.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/cor9/SwirledOut/issues"
+  },
+  "homepage": "https://github.com/cor9/SwirledOut#readme",
+  "dependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@types/simple-peer": "^9.11.9",
+    "@vitejs/plugin-react": "^5.1.2",
+    "autoprefixer": "^10.4.23",
+    "boardgame.io": "^0.50.2",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "postcss": "^8.5.6",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "simple-peer": "^9.11.1",
+    "socket.io-client": "^4.8.1",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^25.0.3",
+    "tsx": "^4.21.0"
+  }
+}
