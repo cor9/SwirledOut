@@ -267,24 +267,31 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
     const boardSize = 30; // Longer board for more gameplay
     const boardTiles = createBoardTiles(boardSize);
 
-    // CRITICAL FIX: Detect solo mode from matchID (since ctx.numPlayers is undefined)
-    // If matchID contains "SOLO", force 1 player
-    const matchIDStr =
-      typeof ctx.matchID === "string" ? ctx.matchID : String(ctx.matchID || "");
-    const isSoloGame =
-      matchIDStr.includes("SOLO") ||
-      (typeof ctx.numPlayers === "number" && ctx.numPlayers === 1);
+    // CRITICAL FIX: Since ctx.numPlayers is always undefined with Local() multiplayer,
+    // we need another way to detect solo mode. 
+    // Check if playOrder only has 1 element AND it's "0" - this indicates solo
+    const isSoloFromPlayOrder = playOrder.length === 1 && playOrder[0] === "0";
+    
+    // Also check matchID if available
+    const matchIDStr = typeof ctx.matchID === "string" ? ctx.matchID : String(ctx.matchID || "");
+    const isSoloFromMatchID = matchIDStr.includes("SOLO");
+    
+    // FORCE SOLO: If Client was created with numPlayers=1, we should only have 1 player
+    // Since Local() creates 4 players by default, we'll force it to 1 if we detect solo
+    const finalIsSolo = isSoloFromPlayOrder || isSoloFromMatchID || 
+                       (typeof ctx.numPlayers === "number" && ctx.numPlayers === 1);
 
+    // FORCE 1 PLAYER FOR SOLO: Always limit to 1 player if solo detected
     const actualNumPlayers = finalIsSolo ? 1 : playOrder.length;
-    const finalPlayOrder = finalIsSolo ? ["0"] : playOrder;
+    const finalPlayOrder = finalIsSolo ? ["0"] : playOrder.slice(0, actualNumPlayers);
 
     console.log(
       "[Game Setup] matchID:",
       ctx.matchID,
       "| playOrder:",
       playOrder,
-      "| isSoloGame (from playOrder):",
-      isSoloGame,
+      "| isSoloFromPlayOrder:",
+      isSoloFromPlayOrder,
       "| isSoloFromMatchID:",
       isSoloFromMatchID,
       "| finalIsSolo:",
