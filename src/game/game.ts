@@ -38,10 +38,11 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
     ];
 
     // Handle both Local and Server multiplayer modes
-    const numPlayers = typeof ctx.numPlayers === 'number' ? ctx.numPlayers : 4;
-    const playOrder = (ctx.playOrder as string[]) || 
+    const numPlayers = typeof ctx.numPlayers === "number" ? ctx.numPlayers : 4;
+    const playOrder =
+      (ctx.playOrder as string[]) ||
       Array.from({ length: numPlayers }, (_: unknown, i: number) => String(i));
-    
+
     return {
       players: playOrder.map((id: string, idx: number) => ({
         id,

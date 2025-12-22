@@ -25,7 +25,9 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
     try {
       // Check if mediaDevices is available (requires HTTPS or localhost)
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error("Media devices not available. Video requires HTTPS or localhost.");
+        throw new Error(
+          "Media devices not available. Video requires HTTPS or localhost."
+        );
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -64,21 +66,21 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-lg rounded-lg p-4">
-      <h3 className="text-white font-bold mb-4">Video Chat</h3>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <h3 className="text-gray-900 font-semibold mb-4">Video Chat</h3>
 
       {!isVideoEnabled ? (
         <div className="space-y-4">
-          <div className="bg-white/5 rounded-lg p-8 border border-white/20 text-center">
-            <p className="text-white/70 mb-4">Video chat is optional</p>
+          <div className="bg-gray-50 rounded-lg p-8 border border-gray-200 text-center">
+            <p className="text-gray-600 mb-4">Video chat is optional</p>
             <button
               onClick={startVideo}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
             >
               Enable Camera
             </button>
           </div>
-          <p className="text-white/60 text-xs text-center">
+          <p className="text-gray-500 text-xs text-center">
             🔒 Video is P2P only, never recorded or stored
           </p>
         </div>
@@ -93,7 +95,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
               playsInline
               className="w-full rounded-lg bg-black"
             />
-            <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
+            <div className="absolute bottom-2 left-2 bg-gray-900/70 text-white px-2 py-1 rounded text-xs">
               You
             </div>
           </div>
@@ -109,7 +111,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
                 }}
                 className="w-full rounded-lg bg-black"
               />
-              <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
+              <div className="absolute bottom-2 left-2 bg-gray-900/70 text-white px-2 py-1 rounded text-xs">
                 Player {id}
               </div>
             </div>
@@ -138,7 +140,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
       )}
 
       {remoteStreams.size === 0 && isVideoEnabled && (
-        <p className="text-white/60 text-xs text-center mt-4">
+        <p className="text-gray-500 text-xs text-center mt-4">
           Waiting for other players to join video...
         </p>
       )}
