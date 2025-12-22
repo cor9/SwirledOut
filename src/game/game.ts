@@ -267,13 +267,20 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
     const boardSize = 30; // Longer board for more gameplay
     const boardTiles = createBoardTiles(boardSize);
 
-    // CRITICAL FIX: If numPlayers is 1, only create 1 player regardless of playOrder
-    const actualNumPlayers = numPlayers === 1 ? 1 : playOrder.length;
-    const finalPlayOrder =
-      actualNumPlayers === 1 ? playOrder.slice(0, 1) : playOrder;
+    // CRITICAL FIX: Detect solo mode from matchID (since ctx.numPlayers is undefined)
+    // If matchID contains "SOLO", force 1 player
+    const isSoloGame = ctx.matchID?.includes("SOLO") || 
+                       (typeof ctx.numPlayers === "number" && ctx.numPlayers === 1);
+    
+    const actualNumPlayers = isSoloGame ? 1 : playOrder.length;
+    const finalPlayOrder = isSoloGame ? ["0"] : playOrder;
 
     console.log(
-      "[Game Setup] actualNumPlayers:",
+      "[Game Setup] matchID:",
+      ctx.matchID,
+      "| isSoloGame:",
+      isSoloGame,
+      "| actualNumPlayers:",
       actualNumPlayers,
       "| finalPlayOrder:",
       finalPlayOrder
