@@ -4,6 +4,7 @@ import { GameRules } from "../game/game";
 interface GameSetupProps {
   onStart: (config: GameConfig) => void;
   onCancel: () => void;
+  isSolo?: boolean;
 }
 
 export interface GameConfig {
@@ -13,10 +14,10 @@ export interface GameConfig {
   playerNames: string[];
 }
 
-export default function GameSetup({ onStart, onCancel }: GameSetupProps) {
-  const [numPlayers, setNumPlayers] = useState(4);
+export default function GameSetup({ onStart, onCancel, isSolo = false }: GameSetupProps) {
+  const [numPlayers, setNumPlayers] = useState(isSolo ? 1 : 4);
   const [boardSize, setBoardSize] = useState(30);
-  const [playerNames, setPlayerNames] = useState<string[]>(["", "", "", ""]);
+  const [playerNames, setPlayerNames] = useState<string[]>(isSolo ? [""] : ["", "", "", ""]);
   const [winCondition, setWinCondition] = useState<GameRules["winCondition"]>("first_to_finish");
   const [allowSkip, setAllowSkip] = useState(true);
   const [punishmentOnSkip, setPunishmentOnSkip] = useState(true);
@@ -73,23 +74,38 @@ export default function GameSetup({ onStart, onCancel }: GameSetupProps) {
         </h2>
 
         <div className="space-y-6">
-          {/* Number of Players */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Number of Players
-            </label>
-            <select
-              value={numPlayers}
-              onChange={(e) => handleNumPlayersChange(parseInt(e.target.value, 10))}
-              className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              {[2, 3, 4, 5, 6].map((n) => (
-                <option key={n} value={n}>
-                  {n} Players
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Number of Players - Hidden for solo play */}
+          {!isSolo && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Number of Players
+              </label>
+              <select
+                value={numPlayers}
+                onChange={(e) => handleNumPlayersChange(parseInt(e.target.value, 10))}
+                className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                {[2, 3, 4, 5, 6].map((n) => (
+                  <option key={n} value={n}>
+                    {n} Players
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Solo Play Info */}
+          {isSolo && (
+            <div className="bg-purple-900/30 border border-purple-500/50 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🎮</span>
+                <div>
+                  <p className="text-purple-200 font-semibold">Solo Play Mode</p>
+                  <p className="text-purple-300 text-sm">Playing by yourself - just you against the board!</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Player Names */}
           <div>

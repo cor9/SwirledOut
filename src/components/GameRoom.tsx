@@ -31,9 +31,14 @@ export default function GameRoom() {
   const App = isSolo ? SoloClient : SwirledOutClient;
 
   useEffect(() => {
-    // Show setup when entering room
-    setShowSetup(true);
-  }, [currentRoom]);
+    // For solo play, skip setup and start immediately
+    if (isSolo) {
+      setShowSetup(false);
+    } else {
+      // Show setup when entering room for multiplayer
+      setShowSetup(true);
+    }
+  }, [currentRoom, isSolo]);
 
   const handleStartGame = (_config: GameConfig) => {
     // TODO: Update Client with config.numPlayers and player names
@@ -57,7 +62,11 @@ export default function GameRoom() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Game Setup Modal */}
         {showSetup && (
-          <GameSetup onStart={handleStartGame} onCancel={handleCancelSetup} />
+          <GameSetup 
+            onStart={handleStartGame} 
+            onCancel={handleCancelSetup}
+            isSolo={isSolo}
+          />
         )}
 
         {/* Rules Display Button */}

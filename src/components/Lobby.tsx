@@ -6,7 +6,9 @@ export default function Lobby() {
   const [roomId, setRoomId] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [gameMode, setGameMode] = useState<"multiplayer" | "solo">("multiplayer");
+  const [gameMode, setGameMode] = useState<"multiplayer" | "solo">(
+    "multiplayer"
+  );
   const { setCurrentRoom, setPlayerName: setStorePlayerName } = useGameStore();
 
   const generateRoomId = () => {

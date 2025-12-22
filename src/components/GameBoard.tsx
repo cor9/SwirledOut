@@ -45,7 +45,11 @@ export default function GameBoard({
   };
 
   const handleMove = () => {
-    if (isMyTurn && G.lastRoll && (G.phase === "playing" || G.phase === "setup")) {
+    if (
+      isMyTurn &&
+      G.lastRoll &&
+      (G.phase === "playing" || G.phase === "setup")
+    ) {
       const currentPlayer = G.players[ctx.currentPlayer];
       const newPosition = Math.min(
         currentPlayer.position + G.lastRoll,
@@ -131,7 +135,9 @@ export default function GameBoard({
     return (
       <div className="w-full">
         <div className="bg-gray-800/50 rounded-xl p-8 border border-purple-500/30 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">🎮 Ready to Play?</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">
+            🎮 Ready to Play?
+          </h2>
           <p className="text-gray-300 mb-6">
             Configure your game settings, then click Start Game to begin!
           </p>
