@@ -13,19 +13,19 @@ import Header from "./Header";
 // IMPORTANT: We must create separate client instances, not reuse them
 const createClient = (numPlayers: number) => {
   console.log("[createClient] Creating NEW client with", numPlayers, "players");
-  
+
   // For Local multiplayer, we need to ensure numPlayers is properly configured
   const multiplayerConfig = Local({
     // Local multiplayer should respect numPlayers from Client config
   });
-  
+
   const client = Client({
     game: SwirledOutGame,
     board: GameBoard,
     multiplayer: multiplayerConfig,
     numPlayers: numPlayers, // Explicitly set
   });
-  
+
   console.log(
     "[createClient] Client created with numPlayers:",
     numPlayers,

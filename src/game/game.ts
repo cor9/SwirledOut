@@ -243,9 +243,16 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
     } else if (Array.isArray(ctx.playOrder) && ctx.playOrder.length > 0) {
       numPlayers = ctx.playOrder.length;
     }
-    
-    console.log("[Game Setup] ctx.numPlayers:", ctx.numPlayers, "| ctx.playOrder:", ctx.playOrder, "| Final numPlayers:", numPlayers);
-    
+
+    console.log(
+      "[Game Setup] ctx.numPlayers:",
+      ctx.numPlayers,
+      "| ctx.playOrder:",
+      ctx.playOrder,
+      "| Final numPlayers:",
+      numPlayers
+    );
+
     const playOrder =
       (ctx.playOrder as string[]) ||
       Array.from({ length: numPlayers }, (_, i: number) => String(i));
@@ -260,8 +267,14 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
     const boardSize = 30; // Longer board for more gameplay
     const boardTiles = createBoardTiles(boardSize);
 
+    // CRITICAL FIX: If numPlayers is 1, only create 1 player regardless of playOrder
+    const actualNumPlayers = numPlayers === 1 ? 1 : playOrder.length;
+    const finalPlayOrder = actualNumPlayers === 1 ? playOrder.slice(0, 1) : playOrder;
+    
+    console.log("[Game Setup] actualNumPlayers:", actualNumPlayers, "| finalPlayOrder:", finalPlayOrder);
+
     return {
-      players: playOrder.map((id: string, idx: number) => ({
+      players: finalPlayOrder.map((id: string, idx: number) => ({
         id,
         name: `Player ${idx + 1}`,
         position: 0,
