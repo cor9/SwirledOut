@@ -25,14 +25,27 @@ export default function GameBoard({
     }
   }, [G.phase, G.currentAction]);
 
+  const handleStartGame = () => {
+    // Transition from setup to playing phase
+    if (moves.startGame) {
+      moves.startGame();
+    } else if (events.setPhase) {
+      events.setPhase("playing");
+    }
+  };
+
   const handleRollDice = () => {
-    if (isMyTurn && G.phase === "playing") {
+    if (isMyTurn && (G.phase === "playing" || G.phase === "setup")) {
       moves.rollDice();
+      // Auto-transition to playing if in setup
+      if (G.phase === "setup" && events.setPhase) {
+        events.setPhase("playing");
+      }
     }
   };
 
   const handleMove = () => {
-    if (isMyTurn && G.lastRoll && G.phase === "playing") {
+    if (isMyTurn && G.lastRoll && (G.phase === "playing" || G.phase === "setup")) {
       const currentPlayer = G.players[ctx.currentPlayer];
       const newPosition = Math.min(
         currentPlayer.position + G.lastRoll,
@@ -113,19 +126,43 @@ export default function GameBoard({
     }
   };
 
+  // Show start game button if in setup phase
+  if (G.phase === "setup") {
+    return (
+      <div className="w-full">
+        <div className="bg-gray-800/50 rounded-xl p-8 border border-purple-500/30 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">🎮 Ready to Play?</h2>
+          <p className="text-gray-300 mb-6">
+            Configure your game settings, then click Start Game to begin!
+          </p>
+          <button
+            onClick={handleStartGame}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
+          >
+            🚀 Start Game
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       {/* Turn Indicator - Prominent */}
-      <div className={`mb-6 p-4 rounded-xl border-2 ${
-        isMyTurn 
-          ? "bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-purple-400 shadow-lg shadow-purple-500/50" 
-          : "bg-gray-800/50 border-gray-600"
-      }`}>
+      <div
+        className={`mb-6 p-4 rounded-xl border-2 ${
+          isMyTurn
+            ? "bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-purple-400 shadow-lg shadow-purple-500/50"
+            : "bg-gray-800/50 border-gray-600"
+        }`}
+      >
         <div className="flex items-center justify-between">
           <div>
-            <h2 className={`text-3xl font-bold ${
-              isMyTurn ? "text-white" : "text-gray-400"
-            }`}>
+            <h2
+              className={`text-3xl font-bold ${
+                isMyTurn ? "text-white" : "text-gray-400"
+              }`}
+            >
               {isMyTurn
                 ? "🎲 YOUR TURN - Take Action!"
                 : `⏳ Player ${ctx.currentPlayer + 1}'s Turn`}
@@ -138,7 +175,9 @@ export default function GameBoard({
           </div>
           {G.lastRoll && (
             <div className="bg-purple-600/20 border border-purple-500/50 rounded-lg px-6 py-3">
-              <div className="text-purple-200 text-xs uppercase tracking-wide">Rolled</div>
+              <div className="text-purple-200 text-xs uppercase tracking-wide">
+                Rolled
+              </div>
               <span className="font-bold text-4xl text-purple-300 block">
                 {G.lastRoll}
               </span>
@@ -165,14 +204,16 @@ export default function GameBoard({
         </div>
       </div>
 
-      {/* Turn Controls - Prominent */}
+      {/* Turn Controls - Always Show When It's Your Turn */}
       <div className="mb-6">
         {isMyTurn ? (
           <div className="space-y-4">
-            {/* Roll Dice Button */}
-            {G.phase === "playing" && !G.lastRoll && (
+            {/* Roll Dice Button - Show if no roll yet */}
+            {!G.lastRoll && (
               <div className="bg-gray-800/50 rounded-xl p-6 border border-purple-500/30">
-                <h3 className="text-white font-semibold mb-4">Step 1: Roll the Dice</h3>
+                <h3 className="text-white font-semibold mb-4">
+                  Step 1: Roll the Dice
+                </h3>
                 <button
                   onClick={handleRollDice}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
@@ -182,10 +223,12 @@ export default function GameBoard({
               </div>
             )}
 
-            {/* Move Button */}
-            {G.lastRoll && G.phase === "playing" && (
+            {/* Move Button - Show if rolled but not moved */}
+            {G.lastRoll && (
               <div className="bg-gray-800/50 rounded-xl p-6 border border-blue-500/30">
-                <h3 className="text-white font-semibold mb-4">Step 2: Move Your Pawn</h3>
+                <h3 className="text-white font-semibold mb-4">
+                  Step 2: Move Your Pawn
+                </h3>
                 <button
                   onClick={handleMove}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
@@ -196,9 +239,11 @@ export default function GameBoard({
             )}
 
             {/* Category Selection (Optional) */}
-            {G.phase === "playing" && !G.lastRoll && (
+            {!G.lastRoll && (
               <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-600">
-                <h3 className="text-white font-semibold mb-3 text-sm">Or Choose a Category:</h3>
+                <h3 className="text-white font-semibold mb-3 text-sm">
+                  Or Choose a Category:
+                </h3>
                 <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => handleCategorySelect("truth")}

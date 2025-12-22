@@ -274,13 +274,22 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
   },
 
   moves: {
+    startGame: (G) => {
+      const gameState = G as unknown as SwirledOutGameState;
+      if (gameState.phase === "setup") {
+        gameState.phase = "playing";
+      }
+    },
+
     rollDice: (G, ctx) => {
       const gameState = G as unknown as SwirledOutGameState;
       // Roll 2 dice for more variation
       const die1 = ctx.random.D6();
       const die2 = ctx.random.D6();
       gameState.lastRoll = die1 + die2;
-      gameState.phase = "playing";
+      if (gameState.phase === "setup") {
+        gameState.phase = "playing";
+      }
     },
 
     movePawn: (G, ctx, position: number) => {
