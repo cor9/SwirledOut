@@ -269,9 +269,15 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
 
     // CRITICAL FIX: If numPlayers is 1, only create 1 player regardless of playOrder
     const actualNumPlayers = numPlayers === 1 ? 1 : playOrder.length;
-    const finalPlayOrder = actualNumPlayers === 1 ? playOrder.slice(0, 1) : playOrder;
-    
-    console.log("[Game Setup] actualNumPlayers:", actualNumPlayers, "| finalPlayOrder:", finalPlayOrder);
+    const finalPlayOrder =
+      actualNumPlayers === 1 ? playOrder.slice(0, 1) : playOrder;
+
+    console.log(
+      "[Game Setup] actualNumPlayers:",
+      actualNumPlayers,
+      "| finalPlayOrder:",
+      finalPlayOrder
+    );
 
     return {
       players: finalPlayOrder.map((id: string, idx: number) => ({
