@@ -12,26 +12,23 @@ import Header from "./Header";
 // Create clients dynamically based on mode
 // IMPORTANT: For solo games, do NOT use Local() - use pure single-player mode
 // For multiplayer, use Local() for local testing
-const createClient = (numPlayers: number, isSolo: boolean) => {
+const createClient = (isSolo: boolean) => {
   console.log(
-    "[createClient] Creating NEW client with",
-    numPlayers,
-    "players, isSolo:",
+    "[createClient] Creating client, isSolo:",
     isSolo
   );
 
   if (isSolo) {
-    // SOLO MODE: Pure single-player, no multiplayer transport
+    // SOLO MODE: Pure single-player, NO multiplayer prop at all
     // This ensures ctx.numPlayers is correctly set to 1
-    // We also pass setupData to force solo mode detection
     const client = Client({
       game: SwirledOutGame,
       board: GameBoard,
       numPlayers: 1, // Critical for solo
-      // Do NOT pass multiplayer prop for true solo
+      // NO multiplayer prop - this is pure single-player mode
     });
     console.log(
-      "[createClient] Solo client created (no multiplayer transport) with numPlayers: 1"
+      "[createClient] Solo client created (pure single-player, no multiplayer transport)"
     );
     return client;
   } else {
@@ -40,7 +37,7 @@ const createClient = (numPlayers: number, isSolo: boolean) => {
       game: SwirledOutGame,
       board: GameBoard,
       multiplayer: Local(),
-      numPlayers: numPlayers,
+      numPlayers: 4, // Default for multiplayer
     });
     console.log(
       "[createClient] Multiplayer client created with Local() transport"
