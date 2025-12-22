@@ -389,7 +389,9 @@ export default function GameBoard({
 
       {/* Debug info */}
       <div className="mb-4 p-3 bg-yellow-900/30 border border-yellow-500/50 rounded text-sm text-yellow-200">
-        <strong>Debug Info:</strong> {G.players.length} player(s) | Current Player: {ctx.currentPlayer} | Your PlayerID: {playerID} | Phase: {G.phase} | Solo Mode: {G.players.length === 1 ? "YES" : "NO"}
+        <strong>Debug Info:</strong> {G.players.length} player(s) | Current
+        Player: {ctx.currentPlayer} | Your PlayerID: {playerID} | Phase:{" "}
+        {G.phase} | Solo Mode: {G.players.length === 1 ? "YES" : "NO"}
       </div>
 
       {/* Players List with Stats */}

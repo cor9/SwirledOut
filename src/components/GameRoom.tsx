@@ -10,13 +10,17 @@ import { useGameStore } from "../store/gameStore";
 import Header from "./Header";
 
 // Create clients dynamically based on mode
+// IMPORTANT: We must create separate client instances, not reuse them
 const createClient = (numPlayers: number) => {
-  return Client({
+  console.log("[createClient] Creating NEW client with", numPlayers, "players");
+  const client = Client({
     game: SwirledOutGame,
     board: GameBoard,
     multiplayer: Local(),
     numPlayers,
   });
+  console.log("[createClient] Client created, numPlayers should be:", numPlayers);
+  return client;
 };
 
 export default function GameRoom() {
@@ -26,20 +30,29 @@ export default function GameRoom() {
   const isSolo = currentRoom?.startsWith("SOLO") ?? false;
 
   // Create the appropriate client based on solo/multiplayer
+  // CRITICAL: Recreate client whenever solo status or gameKey changes
   const App = useMemo(() => {
     const numPlayers = isSolo ? 1 : 4;
-    console.log("[GameRoom] Creating client with", numPlayers, "players. Solo:", isSolo);
-    return createClient(numPlayers);
+    console.log("[GameRoom] useMemo triggered - Creating client with", numPlayers, "players. Solo:", isSolo, "GameKey:", gameKey);
+    const client = createClient(numPlayers);
+    // Verify the client was created correctly
+    console.log("[GameRoom] Client created, should have", numPlayers, "players");
+    return client;
   }, [isSolo, gameKey]);
 
   useEffect(() => {
+    console.log("[GameRoom] useEffect triggered - currentRoom:", currentRoom, "isSolo:", isSolo);
     // For solo play, skip setup and start immediately
     if (isSolo) {
+      console.log("[GameRoom] Solo mode detected - skipping setup, forcing new game");
       setShowSetup(false);
-      // Force a new game key to ensure fresh state
-      setGameKey((prev) => prev + 1);
+      // Force a new game key to ensure fresh state - use timestamp for uniqueness
+      const newKey = Date.now();
+      console.log("[GameRoom] Setting gameKey to:", newKey);
+      setGameKey(newKey);
     } else {
       // Show setup when entering room for multiplayer
+      console.log("[GameRoom] Multiplayer mode - showing setup");
       setShowSetup(true);
       setGameKey(0);
     }

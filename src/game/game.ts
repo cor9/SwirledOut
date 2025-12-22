@@ -241,8 +241,13 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
     const playOrder =
       (ctx.playOrder as string[]) ||
       Array.from({ length: numPlayers }, (_, i: number) => String(i));
-    
-    console.log("[Game Setup] Play order:", playOrder, "| numPlayers:", numPlayers);
+
+    console.log(
+      "[Game Setup] Play order:",
+      playOrder,
+      "| numPlayers:",
+      numPlayers
+    );
 
     const boardSize = 30; // Longer board for more gameplay
     const boardTiles = createBoardTiles(boardSize);
