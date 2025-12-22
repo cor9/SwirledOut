@@ -13,10 +13,7 @@ import Header from "./Header";
 // IMPORTANT: For solo games, do NOT use Local() - use pure single-player mode
 // For multiplayer, use Local() for local testing
 const createClient = (isSolo: boolean) => {
-  console.log(
-    "[createClient] Creating client, isSolo:",
-    isSolo
-  );
+  console.log("[createClient] Creating client, isSolo:", isSolo);
 
   if (isSolo) {
     // SOLO MODE: Pure single-player, NO multiplayer prop at all

@@ -389,9 +389,15 @@ export default function GameBoard({
 
       {/* Debug info */}
       <div className="mb-4 p-3 bg-yellow-900/30 border border-yellow-500/50 rounded text-sm text-yellow-200">
-        <strong>Debug Info:</strong> {G.players.length} player(s) | ctx.numPlayers: {typeof ctx.numPlayers === "number" ? ctx.numPlayers : "undefined"} | Current
-        Player: {ctx.currentPlayer} | Your PlayerID: {playerID} | Phase:{" "}
-        {G.phase} | Solo Mode: {typeof ctx.numPlayers === "number" && ctx.numPlayers === 1 ? "YES" : "NO"}
+        <strong>Debug Info:</strong>{" "}
+        {typeof ctx.numPlayers === "number" ? ctx.numPlayers : G.players.length}{" "}
+        player(s) | ctx.numPlayers:{" "}
+        {typeof ctx.numPlayers === "number" ? ctx.numPlayers : "undefined"} |
+        Current Player: {ctx.currentPlayer} | Your PlayerID: {playerID} | Phase:{" "}
+        {G.phase} | Solo Mode:{" "}
+        {typeof ctx.numPlayers === "number" && ctx.numPlayers === 1
+          ? "YES"
+          : "NO"}
       </div>
 
       {/* Players List with Stats - Only show players that exist */}
@@ -405,14 +411,16 @@ export default function GameBoard({
         }`}
       >
         {/* Only render players that actually exist (0 to numPlayers-1) */}
-        {G.players.filter((_, idx) => {
-          // Only show players up to ctx.numPlayers (if available) or all players
-          const maxPlayers = typeof ctx.numPlayers === "number" ? ctx.numPlayers : G.players.length;
-          return idx < maxPlayers;
-        }).map((player, playerIdx) => {
+        {Array.from({ 
+          length: typeof ctx.numPlayers === "number" ? ctx.numPlayers : G.players.length 
+        }, (_, idx) => {
+          const player = G.players[idx];
+          if (!player) return null;
+          
           const isCurrentPlayer =
             typeof ctx.currentPlayer === "number" &&
-            playerIdx === ctx.currentPlayer;
+            idx === ctx.currentPlayer;
+          
           return (
             <div
               key={player.id}
