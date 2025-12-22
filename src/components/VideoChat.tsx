@@ -25,7 +25,9 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
     try {
       // Check if mediaDevices is available (requires HTTPS or localhost)
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error("Media devices not available. Video requires HTTPS or localhost.");
+        throw new Error(
+          "Media devices not available. Video requires HTTPS or localhost."
+        );
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -39,7 +41,9 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
       }
     } catch (error) {
       console.error("Error accessing media devices:", error);
-      alert("Could not access camera/microphone. You can still play without video.");
+      alert(
+        "Could not access camera/microphone. You can still play without video."
+      );
     }
   };
 

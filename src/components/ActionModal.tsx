@@ -28,7 +28,9 @@ export default function ActionModal({
               intensityColors[action.intensity]
             }`}
           >
-            <span className="font-bold uppercase text-sm">{action.intensity}</span>
+            <span className="font-bold uppercase text-sm">
+              {action.intensity}
+            </span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">Your Action</h2>
           <p className="text-2xl text-purple-200 font-medium">{action.text}</p>

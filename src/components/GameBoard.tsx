@@ -68,7 +68,9 @@ export default function GameBoard({
       <div className="mb-6 space-y-3">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold text-white">
-            {isMyTurn ? "🎲 Your Turn" : `Player ${ctx.currentPlayer + 1}'s Turn`}
+            {isMyTurn
+              ? "🎲 Your Turn"
+              : `Player ${ctx.currentPlayer + 1}'s Turn`}
           </h2>
           {G.lastRoll && (
             <div className="bg-purple-600/20 border border-purple-500/50 rounded-lg px-4 py-2">
@@ -181,9 +183,11 @@ export default function GameBoard({
                 className="w-8 h-8 rounded-full mx-auto mb-2"
                 style={{ backgroundColor: player.color }}
               />
-              <p className={`text-center text-sm font-semibold ${
-                isCurrentPlayer ? "text-purple-200" : "text-gray-300"
-              }`}>
+              <p
+                className={`text-center text-sm font-semibold ${
+                  isCurrentPlayer ? "text-purple-200" : "text-gray-300"
+                }`}
+              >
                 {player.name}
               </p>
               <p className="text-gray-400 text-center text-xs">

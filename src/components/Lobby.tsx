@@ -95,7 +95,11 @@ export default function Lobby() {
                     placeholder="Enter room ID"
                     className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent uppercase"
                     onKeyPress={(e) => {
-                      if (e.key === "Enter" && playerName.trim() && roomId.trim()) {
+                      if (
+                        e.key === "Enter" &&
+                        playerName.trim() &&
+                        roomId.trim()
+                      ) {
                         handleJoinRoom();
                       }
                     }}
@@ -114,14 +118,17 @@ export default function Lobby() {
                 <div className="mt-4 p-4 bg-green-900/30 border border-green-500/50 rounded-lg">
                   <p className="text-green-300 text-center text-sm">
                     Room created! Share this ID:{" "}
-                    <span className="font-bold text-green-200">{roomId || "Generating..."}</span>
+                    <span className="font-bold text-green-200">
+                      {roomId || "Generating..."}
+                    </span>
                   </p>
                 </div>
               )}
 
               <div className="mt-6 pt-6 border-t border-gray-700">
                 <p className="text-gray-400 text-xs text-center">
-                  🔒 All rooms are private and anonymous. No data is stored or logged.
+                  🔒 All rooms are private and anonymous. No data is stored or
+                  logged.
                 </p>
               </div>
             </div>

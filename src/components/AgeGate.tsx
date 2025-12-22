@@ -34,8 +34,8 @@ export default function AgeGate({ onVerify }: AgeGateProps) {
 
             <div className="space-y-6">
               <p className="text-gray-300 text-center">
-                This game contains adult content and themes. You must be 18 years
-                or older to continue.
+                This game contains adult content and themes. You must be 18
+                years or older to continue.
               </p>
 
               <label className="flex items-start space-x-3 cursor-pointer">
@@ -60,8 +60,8 @@ export default function AgeGate({ onVerify }: AgeGateProps) {
 
               <p className="text-gray-400 text-xs text-center">
                 By entering, you agree that all content and interactions are
-                consensual and that you understand the nature of this adult-themed
-                game.
+                consensual and that you understand the nature of this
+                adult-themed game.
               </p>
             </div>
           </div>
