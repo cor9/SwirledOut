@@ -132,10 +132,9 @@ export default function GameRoom() {
             <div className="lg:col-span-2">
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-purple-500/30 shadow-2xl p-6">
                 {/* Multiple keys to force complete remount: room ID, solo status, and game key */}
+                {/* Force complete remount with unique key that includes timestamp */}
                 <App
-                  key={`game-${
-                    isSolo ? "solo" : "multi"
-                  }-${currentRoom}-${gameKey}`}
+                  key={`${isSolo ? "solo" : "multi"}-${currentRoom}-${gameKey}-${Date.now()}`}
                   playerID="0"
                 />
               </div>
