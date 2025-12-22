@@ -236,30 +236,14 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
   setup: (ctx) => {
     const { actionDeck, punishmentDeck } = createDefaultDecks();
 
-    // CRITICAL: boardgame.io's Local() doesn't pass numPlayers to setup
-    // We need to detect solo mode another way
-    // Since ctx.numPlayers is undefined, we'll check if we should force 1 player
-    // The Client is created with numPlayers: 1 for solo, but Local() still creates 4 in playOrder
-    
-    // Check if ctx.numPlayers is set (should work but doesn't with Local())
-    let numPlayers = 4; // default
-    if (typeof ctx.numPlayers === "number" && ctx.numPlayers > 0) {
-      numPlayers = ctx.numPlayers;
-      console.log("[Game Setup] Using ctx.numPlayers:", numPlayers);
-    } else {
-      // ctx.numPlayers is undefined - this is the problem with Local()
-      // We need to detect solo mode by checking if we should limit to 1 player
-      // Since we can't detect it here, we'll use a workaround:
-      // If playOrder only has ["0"], it's solo. Otherwise use playOrder length.
-      const existingPlayOrder = ctx.playOrder as string[] | undefined;
-      if (existingPlayOrder && existingPlayOrder.length === 1 && existingPlayOrder[0] === "0") {
-        numPlayers = 1;
-        console.log("[Game Setup] Detected solo mode from playOrder:", existingPlayOrder);
-      } else if (existingPlayOrder && existingPlayOrder.length > 0) {
-        numPlayers = existingPlayOrder.length;
-        console.log("[Game Setup] Using playOrder length:", numPlayers);
-      }
-    }
+    // Use ctx.numPlayers directly - it will be correctly set when NOT using Local() for solo
+    // For solo games (no multiplayer prop), ctx.numPlayers will be 1
+    // For multiplayer games (with Local() or server), use ctx.numPlayers or fallback to playOrder
+    const numPlayers = typeof ctx.numPlayers === "number" && ctx.numPlayers > 0
+      ? ctx.numPlayers
+      : (Array.isArray(ctx.playOrder) && ctx.playOrder.length > 0
+          ? ctx.playOrder.length
+          : 4); // fallback
 
     console.log(
       "[Game Setup] ctx.numPlayers:",
@@ -270,8 +254,7 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
       numPlayers
     );
 
-    // ALWAYS create our own playOrder based on numPlayers - ignore ctx.playOrder
-    // This ensures we get exactly the number of players we want
+    // Create playOrder based on actual numPlayers
     const playOrder = Array.from({ length: numPlayers }, (_, i: number) =>
       String(i)
     );

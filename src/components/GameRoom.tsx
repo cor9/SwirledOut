@@ -10,35 +10,38 @@ import { useGameStore } from "../store/gameStore";
 import Header from "./Header";
 
 // Create clients dynamically based on mode
-// IMPORTANT: We must create separate client instances, not reuse them
-const createClient = (numPlayers: number, matchID?: string) => {
+// IMPORTANT: For solo games, do NOT use Local() - use pure single-player mode
+// For multiplayer, use Local() for local testing
+const createClient = (numPlayers: number, isSolo: boolean) => {
   console.log(
     "[createClient] Creating NEW client with",
     numPlayers,
-    "players, matchID:",
-    matchID
+    "players, isSolo:",
+    isSolo
   );
 
-  // For Local multiplayer, we need to ensure numPlayers is properly configured
-  const multiplayerConfig = Local({
-    // Local multiplayer should respect numPlayers from Client config
-  });
-
-  const client = Client({
-    game: SwirledOutGame,
-    board: GameBoard,
-    multiplayer: multiplayerConfig,
-    numPlayers: numPlayers, // Explicitly set
-    // Note: matchID is set when starting the client, not in constructor
-  });
-
-  console.log(
-    "[createClient] Client created with numPlayers:",
-    numPlayers,
-    "| matchID:",
-    matchID
-  );
-  return client;
+  if (isSolo) {
+    // SOLO MODE: Pure single-player, no multiplayer transport
+    // This ensures ctx.numPlayers is correctly set to 1
+    const client = Client({
+      game: SwirledOutGame,
+      board: GameBoard,
+      numPlayers: 1, // Critical for solo
+      // Do NOT pass multiplayer prop for true solo
+    });
+    console.log("[createClient] Solo client created (no multiplayer transport)");
+    return client;
+  } else {
+    // MULTIPLAYER MODE: Use Local() for local testing
+    const client = Client({
+      game: SwirledOutGame,
+      board: GameBoard,
+      multiplayer: Local(),
+      numPlayers: numPlayers,
+    });
+    console.log("[createClient] Multiplayer client created with Local() transport");
+    return client;
+  }
 };
 
 export default function GameRoom() {
@@ -59,7 +62,7 @@ export default function GameRoom() {
       "GameKey:",
       gameKey
     );
-    const client = createClient(numPlayers);
+    const client = createClient(numPlayers, isSolo);
     // Verify the client was created correctly
     console.log(
       "[GameRoom] Client created, should have",
