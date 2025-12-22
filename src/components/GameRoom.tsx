@@ -6,10 +6,6 @@ import VideoChat from "./VideoChat";
 import { useGameStore } from "../store/gameStore";
 import Header from "./Header";
 
-interface GameRoomProps {
-  onLeave?: () => void;
-}
-
 const SwirledOutClient = Client({
   game: SwirledOutGame,
   board: GameBoard,
@@ -17,23 +13,22 @@ const SwirledOutClient = Client({
   numPlayers: 4,
 });
 
-export default function GameRoom({ onLeave }: GameRoomProps = {}) {
+export default function GameRoom() {
   const { currentRoom, setCurrentRoom } = useGameStore();
   const App = SwirledOutClient;
 
   const handleLeaveRoom = () => {
     setCurrentRoom(null);
-    if (onLeave) onLeave();
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
       <Header showRoomInfo={true} roomId={currentRoom} />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="mb-4 flex justify-end">
           <button
             onClick={handleLeaveRoom}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium shadow-lg"
           >
             Leave Room
           </button>
@@ -43,7 +38,7 @@ export default function GameRoom({ onLeave }: GameRoomProps = {}) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Game Board - Takes 2 columns on large screens */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-purple-500/30 shadow-2xl p-6">
               <App playerID="0" />
             </div>
           </div>

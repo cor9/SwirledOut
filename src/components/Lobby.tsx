@@ -34,54 +34,58 @@ export default function Lobby() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
       <Header />
       <main className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <div className="w-full max-w-lg">
+          <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 shadow-2xl">
             <div className="text-center mb-8">
-              <p className="text-gray-600 text-sm mb-2">
-                Step into our playful dice game community, where kinky minds craft
-                the experience.
-              </p>
-              <p className="text-gray-500 text-xs">
-                Registration and login are optional to access the game.
+              <h2 className="text-3xl font-bold text-white mb-2">
+                Join the Experience
+              </h2>
+              <p className="text-gray-300 text-sm">
+                Enter your name and begin the session
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Name
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Display name *
                 </label>
                 <input
                   type="text"
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
                   placeholder="Enter your name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter" && playerName.trim()) {
+                      handleCreateRoom();
+                    }
+                  }}
                 />
               </div>
 
               <div className="space-y-3">
                 <button
                   onClick={handleCreateRoom}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-4 rounded-md transition-colors"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg"
                 >
-                  Create New Room
+                  Enter Session
                 </button>
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
+                    <div className="w-full border-t border-gray-600"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">or</span>
+                    <span className="px-2 bg-gray-800 text-gray-400">or</span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Room ID
                   </label>
                   <input
@@ -89,46 +93,50 @@ export default function Lobby() {
                     value={roomId}
                     onChange={(e) => setRoomId(e.target.value.toUpperCase())}
                     placeholder="Enter room ID"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent uppercase"
+                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent uppercase"
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter" && playerName.trim() && roomId.trim()) {
+                        handleJoinRoom();
+                      }
+                    }}
                   />
                 </div>
 
                 <button
                   onClick={handleJoinRoom}
-                  className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2.5 px-4 rounded-md transition-colors"
+                  className="w-full bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
                 >
                   Join Room
                 </button>
               </div>
 
               {isCreating && (
-                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-green-800 text-sm text-center">
+                <div className="mt-4 p-4 bg-green-900/30 border border-green-500/50 rounded-lg">
+                  <p className="text-green-300 text-center text-sm">
                     Room created! Share this ID:{" "}
-                    <span className="font-bold">{roomId || "Generating..."}</span>
+                    <span className="font-bold text-green-200">{roomId || "Generating..."}</span>
                   </p>
                 </div>
               )}
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-gray-500 text-xs text-center">
-                  🔒 All rooms are private and anonymous. No data is stored or
-                  logged.
+              <div className="mt-6 pt-6 border-t border-gray-700">
+                <p className="text-gray-400 text-xs text-center">
+                  🔒 All rooms are private and anonymous. No data is stored or logged.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="mt-6 text-center text-xs text-gray-500">
-            <a href="#" className="hover:text-gray-700">
+            <a href="#" className="hover:text-gray-400 transition-colors">
               Change
             </a>
             {" | "}
-            <a href="#" className="hover:text-gray-700">
+            <a href="#" className="hover:text-gray-400 transition-colors">
               Terms and condition
             </a>
             {" | "}
-            <a href="#" className="hover:text-gray-700">
+            <a href="#" className="hover:text-gray-400 transition-colors">
               Privacy
             </a>
           </div>

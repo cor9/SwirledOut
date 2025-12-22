@@ -14,44 +14,44 @@ export default function ActionModal({
   if (!action) return null;
 
   const intensityColors = {
-    mild: "bg-green-500/20 border-green-500/50 text-green-100",
-    medium: "bg-yellow-500/20 border-yellow-500/50 text-yellow-100",
-    intense: "bg-red-500/20 border-red-500/50 text-red-100",
+    mild: "bg-green-900/40 border-green-500/50 text-green-200",
+    medium: "bg-yellow-900/40 border-yellow-500/50 text-yellow-200",
+    intense: "bg-red-900/40 border-red-500/50 text-red-200",
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-8 max-w-lg w-full border border-gray-200 shadow-xl">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 rounded-2xl p-8 max-w-lg w-full border-2 border-purple-500/50 shadow-2xl">
         <div className="text-center mb-6">
           <div
             className={`inline-block px-4 py-2 rounded-lg mb-4 ${
               intensityColors[action.intensity]
             }`}
           >
-            <span className="font-semibold uppercase">{action.intensity}</span>
+            <span className="font-bold uppercase text-sm">{action.intensity}</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">Your Action</h2>
-          <p className="text-2xl text-white/90 font-medium">{action.text}</p>
+          <p className="text-2xl text-purple-200 font-medium">{action.text}</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           <button
             onClick={onComplete}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg"
           >
             I Completed This
           </button>
 
           <button
             onClick={onSkip}
-            className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            className="w-full bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
           >
             Skip (No Judgment)
           </button>
         </div>
 
-        <div className="mt-6 p-4 bg-blue-500/20 border border-blue-500/50 rounded-lg">
-          <p className="text-blue-100 text-xs text-center">
+        <div className="mt-6 p-4 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+          <p className="text-blue-200 text-xs text-center">
             💬 Remember: All actions are consensual. You can skip at any time
             without judgment.
           </p>

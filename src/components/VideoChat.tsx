@@ -25,9 +25,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
     try {
       // Check if mediaDevices is available (requires HTTPS or localhost)
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error(
-          "Media devices not available. Video requires HTTPS or localhost."
-        );
+        throw new Error("Media devices not available. Video requires HTTPS or localhost.");
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -41,9 +39,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
       }
     } catch (error) {
       console.error("Error accessing media devices:", error);
-      alert(
-        "Could not access camera/microphone. You can still play without video."
-      );
+      alert("Could not access camera/microphone. You can still play without video.");
     }
   };
 
@@ -66,21 +62,21 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-      <h3 className="text-gray-900 font-semibold mb-4">Video Chat</h3>
+    <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-purple-500/30 shadow-2xl p-4">
+      <h3 className="text-white font-bold mb-4">Video Chat</h3>
 
       {!isVideoEnabled ? (
         <div className="space-y-4">
-          <div className="bg-gray-50 rounded-lg p-8 border border-gray-200 text-center">
-            <p className="text-gray-600 mb-4">Video chat is optional</p>
+          <div className="bg-gray-900/50 rounded-lg p-8 border border-gray-700 text-center">
+            <p className="text-gray-300 mb-4">Video chat is optional</p>
             <button
               onClick={startVideo}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 font-medium shadow-lg"
             >
               Enable Camera
             </button>
           </div>
-          <p className="text-gray-500 text-xs text-center">
+          <p className="text-gray-400 text-xs text-center">
             🔒 Video is P2P only, never recorded or stored
           </p>
         </div>
@@ -95,7 +91,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
               playsInline
               className="w-full rounded-lg bg-black"
             />
-            <div className="absolute bottom-2 left-2 bg-gray-900/70 text-white px-2 py-1 rounded text-xs">
+            <div className="absolute bottom-2 left-2 bg-gray-900/80 text-white px-2 py-1 rounded text-xs font-medium">
               You
             </div>
           </div>
@@ -111,7 +107,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
                 }}
                 className="w-full rounded-lg bg-black"
               />
-              <div className="absolute bottom-2 left-2 bg-gray-900/70 text-white px-2 py-1 rounded text-xs">
+              <div className="absolute bottom-2 left-2 bg-gray-900/80 text-white px-2 py-1 rounded text-xs font-medium">
                 Player {id}
               </div>
             </div>
@@ -121,7 +117,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
           <div className="flex gap-2">
             <button
               onClick={toggleAudio}
-              className={`flex-1 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex-1 px-4 py-2 rounded-lg transition-colors font-medium ${
                 isAudioEnabled
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-red-600 hover:bg-red-700"
@@ -131,7 +127,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
             </button>
             <button
               onClick={stopVideo}
-              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors font-medium"
             >
               Stop Video
             </button>
@@ -140,7 +136,7 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
       )}
 
       {remoteStreams.size === 0 && isVideoEnabled && (
-        <p className="text-gray-500 text-xs text-center mt-4">
+        <p className="text-gray-400 text-xs text-center mt-4">
           Waiting for other players to join video...
         </p>
       )}
