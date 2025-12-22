@@ -23,6 +23,11 @@ export default function VideoChat({ roomId: _roomId }: VideoChatProps) {
 
   const startVideo = async () => {
     try {
+      // Check if mediaDevices is available (requires HTTPS or localhost)
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Media devices not available. Video requires HTTPS or localhost.");
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
