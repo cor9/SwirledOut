@@ -236,45 +236,12 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
   setup: (ctx) => {
     const { actionDeck, punishmentDeck } = createDefaultDecks();
 
-    // CRITICAL FIX: Even without Local(), ctx.numPlayers can be undefined
-    // When Client is created with numPlayers: 1 (solo), boardgame.io should pass it to setup
-    // But it doesn't always work, so we need to force it
-    
-    // Check ctx.numPlayers first
-    let numPlayers = typeof ctx.numPlayers === "number" && ctx.numPlayers > 0
+    // Use ctx.numPlayers directly - it should be correctly set to 1 in solo mode
+    // (when Client is created with numPlayers: 1 and no multiplayer prop)
+    // For multiplayer, it will be set by the server or Local() transport
+    const numPlayers = typeof ctx.numPlayers === "number" && ctx.numPlayers > 0
       ? ctx.numPlayers
-      : undefined;
-    
-    // If ctx.numPlayers is undefined, check playOrder
-    // But IMPORTANT: For solo games, we should force 1 player regardless
-    // Since we can't reliably detect solo here, we'll use a heuristic:
-    // If playOrder exists and has 4 elements but we expect 1, force it to 1
-    // Actually, better: if ctx.numPlayers is undefined, it might be solo, so check if we should default to 1
-    
-    if (numPlayers === undefined) {
-      const existingPlayOrder = ctx.playOrder as string[] | undefined;
-      
-      // If playOrder only has ["0"], it's definitely solo
-      if (existingPlayOrder && existingPlayOrder.length === 1 && existingPlayOrder[0] === "0") {
-        numPlayers = 1;
-        console.log("[Game Setup] Solo detected from playOrder ['0'], forcing numPlayers to 1");
-      } else {
-        // Use playOrder length, but this might be wrong for solo
-        numPlayers = existingPlayOrder && existingPlayOrder.length > 0 
-          ? existingPlayOrder.length 
-          : 4;
-        console.log("[Game Setup] ctx.numPlayers undefined, using playOrder length:", numPlayers);
-        
-        // CRITICAL: If we got 4 players but this is a solo game, we need to force it to 1
-        // Since we can't detect solo here, we'll check if the Client was configured for 1 player
-        // by looking at the game state or using a different method
-        // For now, if numPlayers would be 4 but we're in a solo context, force to 1
-        // We'll handle this by always creating only 1 player when numPlayers is undefined
-        // and we're in a situation where we expect solo (which we can't detect here)
-      }
-    } else {
-      console.log("[Game Setup] Using ctx.numPlayers:", numPlayers);
-    }
+      : 4; // Fallback only if numPlayers is somehow not set (shouldn't happen)
     
     // FINAL FIX: If numPlayers is still 4 but we're creating a solo game,
     // we need to force it to 1. Since we can't detect solo in setup,

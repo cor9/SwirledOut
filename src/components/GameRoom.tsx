@@ -16,16 +16,19 @@ const createClient = (isSolo: boolean) => {
   console.log("[createClient] Creating client, isSolo:", isSolo);
 
   if (isSolo) {
-    // SOLO MODE: Pure single-player, NO multiplayer prop at all
-    // This ensures ctx.numPlayers is correctly set to 1
-    const client = Client({
+    // SOLO MODE: Pure single-player, NO multiplayer prop
+    // Explicitly set numPlayers: 1 to ensure ctx.numPlayers = 1 in setup
+    const clientConfig: any = {
       game: SwirledOutGame,
       board: GameBoard,
-      numPlayers: 1, // Critical for solo
+      numPlayers: 1, // CRITICAL: This must be set to 1 for solo
+      playerID: "0",
       // NO multiplayer prop - this is pure single-player mode
-    });
+    };
+    
+    const client = Client(clientConfig);
     console.log(
-      "[createClient] Solo client created (pure single-player, no multiplayer transport)"
+      "[createClient] Solo client created with numPlayers: 1 (pure single-player, no multiplayer transport)"
     );
     return client;
   } else {
