@@ -236,33 +236,36 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
   minPlayers: 1,
   maxPlayers: 6,
   
-  setup: (ctx) => {
+  setup: (ctx, setupData?: { isSolo?: boolean }) => {
     const { actionDeck, punishmentDeck } = createDefaultDecks();
 
     // Use ctx.numPlayers directly - it should be correctly set to 1 in solo mode
     // (when Client is created with numPlayers: 1 and no multiplayer prop)
     // For multiplayer, it will be set by the server or Local() transport
-    // CRITICAL: If ctx.numPlayers is undefined, it might be a solo game where
-    // boardgame.io didn't pass it correctly. In that case, we should check
-    // if we can detect solo mode and force it to 1.
-    
+    // CRITICAL: If ctx.numPlayers is undefined, check setupData or playOrder to detect solo
     let numPlayers = typeof ctx.numPlayers === "number" && ctx.numPlayers > 0
       ? ctx.numPlayers
       : undefined;
     
-    // If ctx.numPlayers is undefined, this might be a solo game
-    // Check if playOrder suggests solo (only ["0"])
+    // If ctx.numPlayers is undefined, try to detect solo mode
     if (numPlayers === undefined) {
-      const existingPlayOrder = ctx.playOrder as string[] | undefined;
-      if (existingPlayOrder && existingPlayOrder.length === 1 && existingPlayOrder[0] === "0") {
+      // Check setupData first (if we pass it)
+      if (setupData?.isSolo) {
         numPlayers = 1;
-        console.log("[Game Setup] ctx.numPlayers undefined but playOrder is ['0'], forcing to 1 (solo mode)");
+        console.log("[Game Setup] Solo detected from setupData, forcing numPlayers to 1");
       } else {
-        // Use playOrder length as fallback
-        numPlayers = existingPlayOrder && existingPlayOrder.length > 0 
-          ? existingPlayOrder.length 
-          : 4;
-        console.log("[Game Setup] ctx.numPlayers undefined, using playOrder length:", numPlayers);
+        // Check playOrder - if it's only ["0"], it's solo
+        const existingPlayOrder = ctx.playOrder as string[] | undefined;
+        if (existingPlayOrder && existingPlayOrder.length === 1 && existingPlayOrder[0] === "0") {
+          numPlayers = 1;
+          console.log("[Game Setup] Solo detected from playOrder ['0'], forcing numPlayers to 1");
+        } else {
+          // Use playOrder length as fallback
+          numPlayers = existingPlayOrder && existingPlayOrder.length > 0 
+            ? existingPlayOrder.length 
+            : 4;
+          console.log("[Game Setup] ctx.numPlayers undefined, using playOrder length:", numPlayers);
+        }
       }
     } else {
       console.log("[Game Setup] Using ctx.numPlayers:", numPlayers);
