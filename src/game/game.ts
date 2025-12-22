@@ -269,23 +269,17 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
       }
     }
     
-    // FINAL FIX: If numPlayers is still 4 but we're creating a solo game,
-    // we need to force it to 1. Since we can't detect solo in setup,
-    // we'll use a workaround: check if we should limit to 1 player
-    // Actually, let's just always respect ctx.numPlayers if it's set, otherwise use playOrder
-    // But if playOrder has 4 and we want 1, we need to override
-    
-    // The real solution: We need to pass solo mode info to setup somehow
-    // For now, let's just use what we have and create players based on numPlayers
-
     console.log(
       "[Game Setup] ctx.numPlayers:",
       ctx.numPlayers,
+      "| ctx.playOrder:",
+      ctx.playOrder,
       "| Final numPlayers:",
       numPlayers
     );
 
-    // Create playOrder based on numPlayers
+    // ALWAYS create our own playOrder based on numPlayers - ignore ctx.playOrder
+    // This ensures we get exactly the number of players we want
     const playOrder = Array.from({ length: numPlayers }, (_, i: number) =>
       String(i)
     );
