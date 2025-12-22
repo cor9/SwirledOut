@@ -411,51 +411,57 @@ export default function GameBoard({
         }`}
       >
         {/* Only render players that actually exist (0 to numPlayers-1) */}
-        {Array.from({ 
-          length: typeof ctx.numPlayers === "number" ? ctx.numPlayers : G.players.length 
-        }, (_, idx) => {
-          const player = G.players[idx];
-          if (!player) return null;
-          
-          const isCurrentPlayer =
-            typeof ctx.currentPlayer === "number" &&
-            idx === ctx.currentPlayer;
-          
-          return (
-            <div
-              key={player.id}
-              className={`p-4 rounded-lg border ${
-                isCurrentPlayer
-                  ? "bg-purple-600/30 border-purple-400 shadow-lg shadow-purple-500/50"
-                  : "bg-gray-700/50 border-gray-600"
-              }`}
-            >
+        {Array.from(
+          {
+            length:
+              typeof ctx.numPlayers === "number"
+                ? ctx.numPlayers
+                : G.players.length,
+          },
+          (_, idx) => {
+            const player = G.players[idx];
+            if (!player) return null;
+
+            const isCurrentPlayer =
+              typeof ctx.currentPlayer === "number" &&
+              idx === ctx.currentPlayer;
+
+            return (
               <div
-                className="w-8 h-8 rounded-full mx-auto mb-2"
-                style={{ backgroundColor: player.color }}
-              />
-              <p
-                className={`text-center text-sm font-semibold ${
-                  isCurrentPlayer ? "text-purple-200" : "text-gray-300"
+                key={player.id}
+                className={`p-4 rounded-lg border ${
+                  isCurrentPlayer
+                    ? "bg-purple-600/30 border-purple-400 shadow-lg shadow-purple-500/50"
+                    : "bg-gray-700/50 border-gray-600"
                 }`}
               >
-                {player.name}
-              </p>
-              <div className="mt-2 space-y-1 text-xs text-gray-400">
-                <div>
-                  Position: {player.position}/{G.boardSize - 1}
-                </div>
-                <div>Score: {player.score}</div>
-                <div>Completed: {player.completedActions}</div>
-                {player.punishments > 0 && (
-                  <div className="text-red-400">
-                    Punishments: {player.punishments}
+                <div
+                  className="w-8 h-8 rounded-full mx-auto mb-2"
+                  style={{ backgroundColor: player.color }}
+                />
+                <p
+                  className={`text-center text-sm font-semibold ${
+                    isCurrentPlayer ? "text-purple-200" : "text-gray-300"
+                  }`}
+                >
+                  {player.name}
+                </p>
+                <div className="mt-2 space-y-1 text-xs text-gray-400">
+                  <div>
+                    Position: {player.position}/{G.boardSize - 1}
                   </div>
-                )}
+                  <div>Score: {player.score}</div>
+                  <div>Completed: {player.completedActions}</div>
+                  {player.punishments > 0 && (
+                    <div className="text-red-400">
+                      Punishments: {player.punishments}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          }
+        )}
       </div>
 
       {/* Safe Word Button - Always visible */}

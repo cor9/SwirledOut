@@ -25,7 +25,7 @@ const createClient = (isSolo: boolean) => {
       playerID: "0",
       // NO multiplayer prop - this is pure single-player mode
     };
-    
+
     const client = Client(clientConfig);
     console.log(
       "[createClient] Solo client created with numPlayers: 1 (pure single-player, no multiplayer transport)"
