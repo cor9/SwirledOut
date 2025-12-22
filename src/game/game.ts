@@ -236,7 +236,7 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
   minPlayers: 1,
   maxPlayers: 6,
   
-  setup: (ctx, setupData?: { isSolo?: boolean }) => {
+  setup: (ctx) => {
     const { actionDeck, punishmentDeck } = createDefaultDecks();
 
     // CRITICAL ISSUE: Even with numPlayers: 1 in Client config, ctx.numPlayers is undefined
