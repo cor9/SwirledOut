@@ -235,18 +235,26 @@ const createBoardTiles = (boardSize: number): BoardTile[] => {
 export const SwirledOutGame: Game<SwirledOutGameState> = {
   setup: (ctx) => {
     const { actionDeck, punishmentDeck } = createDefaultDecks();
-    // Force numPlayers to be respected - use ctx.numPlayers directly
-    const numPlayers = typeof ctx.numPlayers === "number" ? ctx.numPlayers : 4;
-    console.log("[Game Setup] Creating game with", numPlayers, "players");
+    // CRITICAL: ctx.numPlayers should be set by the Client, but we need to ensure it's respected
+    // Check both ctx.numPlayers and ctx.playOrder.length as fallback
+    let numPlayers = 4; // default
+    if (typeof ctx.numPlayers === "number" && ctx.numPlayers > 0) {
+      numPlayers = ctx.numPlayers;
+    } else if (Array.isArray(ctx.playOrder) && ctx.playOrder.length > 0) {
+      numPlayers = ctx.playOrder.length;
+    }
+    
+    console.log("[Game Setup] ctx.numPlayers:", ctx.numPlayers, "| ctx.playOrder:", ctx.playOrder, "| Final numPlayers:", numPlayers);
+    
     const playOrder =
       (ctx.playOrder as string[]) ||
       Array.from({ length: numPlayers }, (_, i: number) => String(i));
 
     console.log(
-      "[Game Setup] Play order:",
-      playOrder,
-      "| numPlayers:",
-      numPlayers
+      "[Game Setup] Creating game with",
+      numPlayers,
+      "players | Play order:",
+      playOrder
     );
 
     const boardSize = 30; // Longer board for more gameplay

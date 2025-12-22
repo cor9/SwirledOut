@@ -19,7 +19,10 @@ const createClient = (numPlayers: number) => {
     multiplayer: Local(),
     numPlayers,
   });
-  console.log("[createClient] Client created, numPlayers should be:", numPlayers);
+  console.log(
+    "[createClient] Client created, numPlayers should be:",
+    numPlayers
+  );
   return client;
 };
 
@@ -33,18 +36,36 @@ export default function GameRoom() {
   // CRITICAL: Recreate client whenever solo status or gameKey changes
   const App = useMemo(() => {
     const numPlayers = isSolo ? 1 : 4;
-    console.log("[GameRoom] useMemo triggered - Creating client with", numPlayers, "players. Solo:", isSolo, "GameKey:", gameKey);
+    console.log(
+      "[GameRoom] useMemo triggered - Creating client with",
+      numPlayers,
+      "players. Solo:",
+      isSolo,
+      "GameKey:",
+      gameKey
+    );
     const client = createClient(numPlayers);
     // Verify the client was created correctly
-    console.log("[GameRoom] Client created, should have", numPlayers, "players");
+    console.log(
+      "[GameRoom] Client created, should have",
+      numPlayers,
+      "players"
+    );
     return client;
   }, [isSolo, gameKey]);
 
   useEffect(() => {
-    console.log("[GameRoom] useEffect triggered - currentRoom:", currentRoom, "isSolo:", isSolo);
+    console.log(
+      "[GameRoom] useEffect triggered - currentRoom:",
+      currentRoom,
+      "isSolo:",
+      isSolo
+    );
     // For solo play, skip setup and start immediately
     if (isSolo) {
-      console.log("[GameRoom] Solo mode detected - skipping setup, forcing new game");
+      console.log(
+        "[GameRoom] Solo mode detected - skipping setup, forcing new game"
+      );
       setShowSetup(false);
       // Force a new game key to ensure fresh state - use timestamp for uniqueness
       const newKey = Date.now();
@@ -134,7 +155,9 @@ export default function GameRoom() {
                 {/* Multiple keys to force complete remount: room ID, solo status, and game key */}
                 {/* Force complete remount with unique key that includes timestamp */}
                 <App
-                  key={`${isSolo ? "solo" : "multi"}-${currentRoom}-${gameKey}-${Date.now()}`}
+                  key={`${
+                    isSolo ? "solo" : "multi"
+                  }-${currentRoom}-${gameKey}-${Date.now()}`}
                   playerID="0"
                 />
               </div>
