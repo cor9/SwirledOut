@@ -24,10 +24,12 @@ export default function GameRoom() {
   const [showSetup, setShowSetup] = useState(true);
   const [gameKey, setGameKey] = useState(0);
   const isSolo = currentRoom?.startsWith("SOLO") ?? false;
-  
+
   // Create the appropriate client based on solo/multiplayer
   const App = useMemo(() => {
-    return isSolo ? createClient(1) : createClient(4);
+    const numPlayers = isSolo ? 1 : 4;
+    console.log("[GameRoom] Creating client with", numPlayers, "players. Solo:", isSolo);
+    return createClient(numPlayers);
   }, [isSolo, gameKey]);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function GameRoom() {
     if (isSolo) {
       setShowSetup(false);
       // Force a new game key to ensure fresh state
-      setGameKey(prev => prev + 1);
+      setGameKey((prev) => prev + 1);
     } else {
       // Show setup when entering room for multiplayer
       setShowSetup(true);
@@ -47,7 +49,7 @@ export default function GameRoom() {
     // TODO: Update Client with config.numPlayers and player names
     setShowSetup(false);
     // Force remount
-    setGameKey(prev => prev + 1);
+    setGameKey((prev) => prev + 1);
   };
 
   const handleCancelSetup = () => {
@@ -117,9 +119,11 @@ export default function GameRoom() {
             <div className="lg:col-span-2">
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-purple-500/30 shadow-2xl p-6">
                 {/* Multiple keys to force complete remount: room ID, solo status, and game key */}
-                <App 
-                  key={`game-${isSolo ? "solo" : "multi"}-${currentRoom}-${gameKey}`} 
-                  playerID="0" 
+                <App
+                  key={`game-${
+                    isSolo ? "solo" : "multi"
+                  }-${currentRoom}-${gameKey}`}
+                  playerID="0"
                 />
               </div>
             </div>
