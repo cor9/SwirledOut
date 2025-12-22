@@ -238,18 +238,36 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
   name: "SwirledOut",
   minPlayers: 1,
   maxPlayers: 6,
-  
+
   // CRITICAL FIX: This pulls numPlayers from Client config into ctx.numPlayers
   // When Client is created with numPlayers: 1 (solo), this ensures ctx.numPlayers = 1
   numPlayers: ({ numPlayers }: { numPlayers?: number }) => numPlayers ?? 4,
-  
-  
+
   setup: (ctx) => {
     const { actionDeck, punishmentDeck } = createDefaultDecks();
 
     // Now ctx.numPlayers should be correctly set (1 for solo, correct # for multi)
     // Thanks to the numPlayers property in the game config above
-    const numPlayers = ctx.numPlayers;
+    // BUT: If it's still undefined (boardgame.io 0.50.2 bug), use fallback logic
+    let numPlayers = ctx.numPlayers;
+    
+    // FALLBACK: If ctx.numPlayers is undefined, detect solo from playOrder
+    if (typeof numPlayers !== "number" || numPlayers <= 0) {
+      const existingPlayOrder = ctx.playOrder as string[] | undefined;
+      if (existingPlayOrder && existingPlayOrder.length === 1 && existingPlayOrder[0] === "0") {
+        // Solo mode: playOrder is ["0"]
+        numPlayers = 1;
+        console.log("[Game Setup] Fallback: Solo detected from playOrder ['0'], forcing numPlayers to 1");
+      } else if (existingPlayOrder && existingPlayOrder.length > 0) {
+        // Multiplayer: use playOrder length
+        numPlayers = existingPlayOrder.length;
+        console.log("[Game Setup] Fallback: Using playOrder length:", numPlayers);
+      } else {
+        // Last resort: default to 4
+        numPlayers = 4;
+        console.log("[Game Setup] Fallback: Defaulting to 4 players");
+      }
+    }
     
     console.log(
       "[Game Setup] ctx.numPlayers:",
