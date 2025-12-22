@@ -42,8 +42,12 @@ export default function Lobby() {
       return;
     }
     setStorePlayerName(playerName);
-    // Use a special room ID for solo play
-    setCurrentRoom("SOLO");
+    // Clear any existing room state
+    setCurrentRoom(null);
+    // Use a special room ID for solo play - add timestamp to force fresh state
+    setTimeout(() => {
+      setCurrentRoom(`SOLO-${Date.now()}`);
+    }, 100);
   };
 
   return (

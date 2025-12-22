@@ -22,36 +22,44 @@ const createClient = (numPlayers: number) => {
 export default function GameRoom() {
   const { currentRoom, setCurrentRoom, playerName } = useGameStore();
   const [showSetup, setShowSetup] = useState(true);
-  const isSolo = currentRoom === "SOLO";
+  const [gameKey, setGameKey] = useState(0);
+  const isSolo = currentRoom?.startsWith("SOLO") ?? false;
   
   // Create the appropriate client based on solo/multiplayer
   const App = useMemo(() => {
     return isSolo ? createClient(1) : createClient(4);
-  }, [isSolo]);
+  }, [isSolo, gameKey]);
 
   useEffect(() => {
     // For solo play, skip setup and start immediately
     if (isSolo) {
       setShowSetup(false);
+      // Force a new game key to ensure fresh state
+      setGameKey(prev => prev + 1);
     } else {
       // Show setup when entering room for multiplayer
       setShowSetup(true);
+      setGameKey(0);
     }
   }, [currentRoom, isSolo]);
 
   const handleStartGame = (_config: GameConfig) => {
     // TODO: Update Client with config.numPlayers and player names
     setShowSetup(false);
+    // Force remount
+    setGameKey(prev => prev + 1);
   };
 
   const handleCancelSetup = () => {
     setCurrentRoom(null);
+    setGameKey(0);
   };
 
   const handleLeaveRoom = () => {
     if (confirm("Are you sure you want to leave the game?")) {
       setCurrentRoom(null);
       setShowSetup(true);
+      setGameKey(0);
     }
   };
 
@@ -108,8 +116,11 @@ export default function GameRoom() {
             {/* Game Board - Takes 2 columns on large screens */}
             <div className="lg:col-span-2">
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-purple-500/30 shadow-2xl p-6">
-                {/* Key forces remount when switching between solo/multiplayer */}
-                <App key={isSolo ? "solo" : "multi"} playerID="0" />
+                {/* Multiple keys to force complete remount: room ID, solo status, and game key */}
+                <App 
+                  key={`game-${isSolo ? "solo" : "multi"}-${currentRoom}-${gameKey}`} 
+                  playerID="0" 
+                />
               </div>
             </div>
 

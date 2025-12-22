@@ -388,13 +388,15 @@ export default function GameBoard({
       </div>
 
       {/* Players List with Stats */}
-      <div className={`mt-6 grid gap-4 ${
-        G.players.length === 1 
-          ? "grid-cols-1 max-w-md mx-auto" 
-          : G.players.length === 2 
-          ? "grid-cols-2" 
-          : "grid-cols-2 md:grid-cols-4"
-      }`}>
+      <div
+        className={`mt-6 grid gap-4 ${
+          G.players.length === 1
+            ? "grid-cols-1 max-w-md mx-auto"
+            : G.players.length === 2
+            ? "grid-cols-2"
+            : "grid-cols-2 md:grid-cols-4"
+        }`}
+      >
         {G.players.map((player, playerIdx) => {
           const isCurrentPlayer =
             typeof ctx.currentPlayer === "number" &&
