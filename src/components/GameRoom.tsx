@@ -23,6 +23,7 @@ const createClient = (numPlayers: number, isSolo: boolean) => {
   if (isSolo) {
     // SOLO MODE: Pure single-player, no multiplayer transport
     // This ensures ctx.numPlayers is correctly set to 1
+    // We also pass setupData to force solo mode detection
     const client = Client({
       game: SwirledOutGame,
       board: GameBoard,
@@ -30,7 +31,7 @@ const createClient = (numPlayers: number, isSolo: boolean) => {
       // Do NOT pass multiplayer prop for true solo
     });
     console.log(
-      "[createClient] Solo client created (no multiplayer transport)"
+      "[createClient] Solo client created (no multiplayer transport) with numPlayers: 1"
     );
     return client;
   } else {
@@ -57,21 +58,17 @@ export default function GameRoom() {
   // Create the appropriate client based on solo/multiplayer
   // CRITICAL: Recreate client whenever solo status or gameKey changes
   const App = useMemo(() => {
-    const numPlayers = isSolo ? 1 : 4;
     console.log(
-      "[GameRoom] useMemo triggered - Creating client with",
-      numPlayers,
-      "players. Solo:",
+      "[GameRoom] useMemo triggered - Creating client. Solo:",
       isSolo,
       "GameKey:",
       gameKey
     );
-    const client = createClient(numPlayers, isSolo);
-    // Verify the client was created correctly
+    const client = createClient(isSolo);
     console.log(
-      "[GameRoom] Client created, should have",
-      numPlayers,
-      "players"
+      "[GameRoom] Client created for",
+      isSolo ? "solo" : "multiplayer",
+      "mode"
     );
     return client;
   }, [isSolo, gameKey]);

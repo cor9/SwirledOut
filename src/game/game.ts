@@ -236,44 +236,21 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
   setup: (ctx) => {
     const { actionDeck, punishmentDeck } = createDefaultDecks();
 
-    // Use ctx.numPlayers directly - it will be correctly set when NOT using Local() for solo
-    // For solo games (no multiplayer prop), ctx.numPlayers should be 1
-    // For multiplayer games (with Local() or server), use ctx.numPlayers or fallback to playOrder
-    
-    // Get initial numPlayers from ctx
-    let numPlayers =
-      typeof ctx.numPlayers === "number" && ctx.numPlayers > 0
-        ? ctx.numPlayers
-        : Array.isArray(ctx.playOrder) && ctx.playOrder.length > 0
-        ? ctx.playOrder.length
-        : 4; // fallback
-
-    // CRITICAL FIX: If ctx.numPlayers is undefined but playOrder suggests solo (only ["0"]),
-    // force numPlayers to 1. This handles the case where boardgame.io doesn't pass numPlayers
-    // even in pure single-player mode.
-    const existingPlayOrder = ctx.playOrder as string[] | undefined;
-    if (
-      typeof ctx.numPlayers !== "number" &&
-      existingPlayOrder &&
-      existingPlayOrder.length === 1 &&
-      existingPlayOrder[0] === "0"
-    ) {
-      numPlayers = 1;
-      console.log(
-        "[Game Setup] Detected solo mode from playOrder, forcing numPlayers to 1"
-      );
-    }
+    // Trust ctx.numPlayers directly - it will be correctly set to 1 in solo mode
+    // (when Client is created without multiplayer prop)
+    // For multiplayer, it will be set by the server or Local() transport
+    const numPlayers = typeof ctx.numPlayers === "number" && ctx.numPlayers > 0
+      ? ctx.numPlayers
+      : 4; // Fallback only if numPlayers is not set (shouldn't happen)
 
     console.log(
       "[Game Setup] ctx.numPlayers:",
       ctx.numPlayers,
-      "| ctx.playOrder:",
-      ctx.playOrder,
       "| Final numPlayers:",
       numPlayers
     );
 
-    // ALWAYS create our own playOrder based on numPlayers - this ensures correct player count
+    // Create playOrder based on numPlayers
     const playOrder = Array.from({ length: numPlayers }, (_, i: number) =>
       String(i)
     );

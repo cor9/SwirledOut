@@ -389,12 +389,12 @@ export default function GameBoard({
 
       {/* Debug info */}
       <div className="mb-4 p-3 bg-yellow-900/30 border border-yellow-500/50 rounded text-sm text-yellow-200">
-        <strong>Debug Info:</strong> {G.players.length} player(s) | Current
+        <strong>Debug Info:</strong> {G.players.length} player(s) | ctx.numPlayers: {typeof ctx.numPlayers === "number" ? ctx.numPlayers : "undefined"} | Current
         Player: {ctx.currentPlayer} | Your PlayerID: {playerID} | Phase:{" "}
-        {G.phase} | Solo Mode: {G.players.length === 1 ? "YES" : "NO"}
+        {G.phase} | Solo Mode: {typeof ctx.numPlayers === "number" && ctx.numPlayers === 1 ? "YES" : "NO"}
       </div>
 
-      {/* Players List with Stats */}
+      {/* Players List with Stats - Only show players that exist */}
       <div
         className={`mt-6 grid gap-4 ${
           G.players.length === 1
@@ -404,7 +404,12 @@ export default function GameBoard({
             : "grid-cols-2 md:grid-cols-4"
         }`}
       >
-        {G.players.map((player, playerIdx) => {
+        {/* Only render players that actually exist (0 to numPlayers-1) */}
+        {G.players.filter((_, idx) => {
+          // Only show players up to ctx.numPlayers (if available) or all players
+          const maxPlayers = typeof ctx.numPlayers === "number" ? ctx.numPlayers : G.players.length;
+          return idx < maxPlayers;
+        }).map((player, playerIdx) => {
           const isCurrentPlayer =
             typeof ctx.currentPlayer === "number" &&
             playerIdx === ctx.currentPlayer;
