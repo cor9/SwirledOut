@@ -12,13 +12,18 @@ import Header from "./Header";
 // Create clients dynamically based on mode
 // IMPORTANT: We must create separate client instances, not reuse them
 const createClient = (numPlayers: number, matchID?: string) => {
-  console.log("[createClient] Creating NEW client with", numPlayers, "players, matchID:", matchID);
-  
+  console.log(
+    "[createClient] Creating NEW client with",
+    numPlayers,
+    "players, matchID:",
+    matchID
+  );
+
   // For Local multiplayer, we need to ensure numPlayers is properly configured
   const multiplayerConfig = Local({
     // Local multiplayer should respect numPlayers from Client config
   });
-  
+
   const client = Client({
     game: SwirledOutGame,
     board: GameBoard,
@@ -26,7 +31,7 @@ const createClient = (numPlayers: number, matchID?: string) => {
     numPlayers: numPlayers, // Explicitly set
     // Note: matchID is set when starting the client, not in constructor
   });
-  
+
   console.log(
     "[createClient] Client created with numPlayers:",
     numPlayers,
@@ -169,7 +174,9 @@ export default function GameRoom() {
                     isSolo ? "solo" : "multi"
                   }-${currentRoom}-${gameKey}-${Date.now()}`}
                   playerID="0"
-                  matchID={isSolo ? `SOLO-${currentRoom}` : currentRoom || undefined}
+                  matchID={
+                    isSolo ? `SOLO-${currentRoom}` : currentRoom || undefined
+                  }
                 />
               </div>
             </div>
