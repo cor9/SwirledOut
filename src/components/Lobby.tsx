@@ -67,7 +67,10 @@ export default function Lobby() {
 
             <div className="space-y-6">
               <div>
-                <label htmlFor="player-name" className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  htmlFor="player-name"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
                   Display name *
                 </label>
                 <input
@@ -158,7 +161,10 @@ export default function Lobby() {
                   </div>
 
                   <div>
-                    <label htmlFor="room-id" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label
+                      htmlFor="room-id"
+                      className="block text-sm font-medium text-gray-300 mb-2"
+                    >
                       Room ID
                     </label>
                     <input
