@@ -169,6 +169,7 @@ export default function GameRoom() {
                     isSolo ? "solo" : "multi"
                   }-${currentRoom}-${gameKey}-${Date.now()}`}
                   playerID="0"
+                  matchID={isSolo ? `SOLO-${currentRoom}` : currentRoom || undefined}
                 />
               </div>
             </div>
