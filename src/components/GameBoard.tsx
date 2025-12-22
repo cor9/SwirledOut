@@ -130,27 +130,8 @@ export default function GameBoard({
     }
   };
 
-  // Show start game button if in setup phase
-  if (G.phase === "setup") {
-    return (
-      <div className="w-full">
-        <div className="bg-gray-800/50 rounded-xl p-8 border border-purple-500/30 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            🎮 Ready to Play?
-          </h2>
-          <p className="text-gray-300 mb-6">
-            Configure your game settings, then click Start Game to begin!
-          </p>
-          <button
-            onClick={handleStartGame}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
-          >
-            🚀 Start Game
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Show start game button if in setup phase, but also show it alongside turn controls
+  const showStartButton = G.phase === "setup";
 
   return (
     <div className="w-full">
@@ -210,9 +191,28 @@ export default function GameBoard({
         </div>
       </div>
 
-      {/* Turn Controls - Always Show When It's Your Turn */}
+      {/* Start Game Button - Show if in setup phase */}
+      {showStartButton && (
+        <div className="mb-6 bg-gray-800/50 rounded-xl p-6 border border-purple-500/30 text-center">
+          <h3 className="text-2xl font-bold text-white mb-3">
+            🎮 Ready to Play?
+          </h3>
+          <p className="text-gray-300 mb-4">
+            Click the button below to start the game!
+          </p>
+          <button
+            onClick={handleStartGame}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
+          >
+            🚀 Start Game
+          </button>
+        </div>
+      )}
+
+      {/* Turn Controls - Always Show When It's Your Turn OR if it's the first player's turn */}
       <div className="mb-6">
-        {isMyTurn ? (
+        {/* Show controls if it's your turn OR if it's player 0's turn and we're player 0 (fallback for solo/local play) */}
+        {(isMyTurn || (typeof ctx.currentPlayer === "number" && ctx.currentPlayer === 0 && playerIDNum === 0)) ? (
           <div className="space-y-4">
             {/* Roll Dice Button - Show if no roll yet */}
             {!G.lastRoll && (
@@ -226,6 +226,9 @@ export default function GameBoard({
                 >
                   🎲 Roll Dice (2 dice = 2-12)
                 </button>
+                <p className="text-gray-400 text-sm mt-2 text-center">
+                  Click to roll two dice and see how many spaces you can move
+                </p>
               </div>
             )}
 
@@ -241,6 +244,9 @@ export default function GameBoard({
                 >
                   👉 Move {G.lastRoll} Spaces
                 </button>
+                <p className="text-gray-400 text-sm mt-2 text-center">
+                  Click to move your pawn {G.lastRoll} spaces forward on the board
+                </p>
               </div>
             )}
 
@@ -281,8 +287,11 @@ export default function GameBoard({
           </div>
         ) : (
           <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-600 text-center">
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-400 text-lg mb-2">
               Waiting for Player {ctx.currentPlayer + 1} to take their turn...
+            </p>
+            <p className="text-gray-500 text-sm">
+              When it's your turn, action buttons will appear here
             </p>
           </div>
         )}
