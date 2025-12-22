@@ -67,14 +67,17 @@ export default function Lobby() {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="player-name" className="block text-sm font-medium text-gray-300 mb-2">
                   Display name *
                 </label>
                 <input
+                  id="player-name"
+                  name="player-name"
                   type="text"
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
                   placeholder="Enter your name"
+                  autoComplete="name"
                   className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   onKeyPress={(e) => {
                     if (e.key === "Enter" && playerName.trim()) {
@@ -155,14 +158,17 @@ export default function Lobby() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label htmlFor="room-id" className="block text-sm font-medium text-gray-300 mb-2">
                       Room ID
                     </label>
                     <input
+                      id="room-id"
+                      name="room-id"
                       type="text"
                       value={roomId}
                       onChange={(e) => setRoomId(e.target.value.toUpperCase())}
                       placeholder="Enter room ID"
+                      autoComplete="off"
                       className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent uppercase"
                       onKeyPress={(e) => {
                         if (

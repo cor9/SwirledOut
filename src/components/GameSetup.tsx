@@ -116,10 +116,13 @@ export default function GameSetup({ onStart, onCancel, isSolo = false }: GameSet
               {Array.from({ length: numPlayers }).map((_, idx) => (
                 <input
                   key={idx}
+                  id={`player-${idx + 1}-name`}
+                  name={`player-${idx + 1}-name`}
                   type="text"
                   value={playerNames[idx] || ""}
                   onChange={(e) => handlePlayerNameChange(idx, e.target.value)}
                   placeholder={`Player ${idx + 1} name`}
+                  autoComplete="name"
                   className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               ))}

@@ -235,14 +235,14 @@ const createBoardTiles = (boardSize: number): BoardTile[] => {
 export const SwirledOutGame: Game<SwirledOutGameState> = {
   setup: (ctx) => {
     const { actionDeck, punishmentDeck } = createDefaultDecks();
-    // CRITICAL: ctx.numPlayers should be set by the Client, but we need to ensure it's respected
-    // Check both ctx.numPlayers and ctx.playOrder.length as fallback
-    let numPlayers = 4; // default
-    if (typeof ctx.numPlayers === "number" && ctx.numPlayers > 0) {
-      numPlayers = ctx.numPlayers;
-    } else if (Array.isArray(ctx.playOrder) && ctx.playOrder.length > 0) {
-      numPlayers = ctx.playOrder.length;
-    }
+    
+    // Use ctx.numPlayers directly - it will be correctly set to 1 in solo mode
+    // Fallback to playOrder.length if numPlayers is not set (shouldn't happen, but safety)
+    const numPlayers = typeof ctx.numPlayers === "number" && ctx.numPlayers > 0 
+      ? ctx.numPlayers 
+      : (Array.isArray(ctx.playOrder) && ctx.playOrder.length > 0 
+          ? ctx.playOrder.length 
+          : 4); // absolute fallback
 
     console.log(
       "[Game Setup] ctx.numPlayers:",
@@ -253,9 +253,8 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
       numPlayers
     );
 
-    const playOrder =
-      (ctx.playOrder as string[]) ||
-      Array.from({ length: numPlayers }, (_, i: number) => String(i));
+    // Create playOrder based on actual numPlayers
+    const playOrder = Array.from({ length: numPlayers }, (_, i: number) => String(i));
 
     console.log(
       "[Game Setup] Creating game with",
@@ -267,43 +266,8 @@ export const SwirledOutGame: Game<SwirledOutGameState> = {
     const boardSize = 30; // Longer board for more gameplay
     const boardTiles = createBoardTiles(boardSize);
 
-    // CRITICAL FIX: Since ctx.numPlayers is always undefined with Local() multiplayer,
-    // we need another way to detect solo mode. 
-    // Check if playOrder only has 1 element AND it's "0" - this indicates solo
-    const isSoloFromPlayOrder = playOrder.length === 1 && playOrder[0] === "0";
-    
-    // Also check matchID if available
-    const matchIDStr = typeof ctx.matchID === "string" ? ctx.matchID : String(ctx.matchID || "");
-    const isSoloFromMatchID = matchIDStr.includes("SOLO");
-    
-    // FORCE SOLO: If Client was created with numPlayers=1, we should only have 1 player
-    // Since Local() creates 4 players by default, we'll force it to 1 if we detect solo
-    const finalIsSolo = isSoloFromPlayOrder || isSoloFromMatchID || 
-                       (typeof ctx.numPlayers === "number" && ctx.numPlayers === 1);
-
-    // FORCE 1 PLAYER FOR SOLO: Always limit to 1 player if solo detected
-    const actualNumPlayers = finalIsSolo ? 1 : playOrder.length;
-    const finalPlayOrder = finalIsSolo ? ["0"] : playOrder.slice(0, actualNumPlayers);
-
-    console.log(
-      "[Game Setup] matchID:",
-      ctx.matchID,
-      "| playOrder:",
-      playOrder,
-      "| isSoloFromPlayOrder:",
-      isSoloFromPlayOrder,
-      "| isSoloFromMatchID:",
-      isSoloFromMatchID,
-      "| finalIsSolo:",
-      finalIsSolo,
-      "| actualNumPlayers:",
-      actualNumPlayers,
-      "| finalPlayOrder:",
-      finalPlayOrder
-    );
-
     return {
-      players: finalPlayOrder.map((id: string, idx: number) => ({
+      players: playOrder.map((id: string, idx: number) => ({
         id,
         name: `Player ${idx + 1}`,
         position: 0,
