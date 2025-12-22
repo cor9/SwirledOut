@@ -14,7 +14,7 @@ Multiplayer online kink boardgame - An open-source, privacy-focused, turn-based 
 
 ## Tech Stack
 
-- **Frontend**: React 18+, TypeScript, Vite, Tailwind CSS
+- **Frontend**: React 18+, TypeScript, Vite, Tailwind CSS v4
 - **Game Logic**: boardgame.io
 - **Multiplayer Sync**: boardgame.io server (Node.js)
 - **Video Chat**: WebRTC with simple-peer (P2P mesh)
@@ -56,6 +56,19 @@ npm run server
 
 The app will be available at `http://localhost:3000`
 
+## Netlify Deployment
+
+The app is configured for Netlify deployment:
+
+- **Build command**: `npm run build`
+- **Publish directory**: `dist`
+- **Configuration**: `netlify.toml`
+
+To trigger a rebuild on Netlify:
+
+1. Push to the `main` branch (auto-deploys)
+2. Or manually trigger in Netlify dashboard: Site settings → Build & deploy → Trigger deploy
+
 ## Project Structure
 
 ```
@@ -67,7 +80,8 @@ SwirledOut/
 │   │   ├── GameRoom.tsx      # Main game room
 │   │   ├── GameBoard.tsx     # Game board UI
 │   │   ├── ActionModal.tsx   # Action card display
-│   │   └── VideoChat.tsx      # WebRTC video chat
+│   │   ├── VideoChat.tsx      # WebRTC video chat
+│   │   └── Header.tsx         # Site header with logo
 │   ├── game/
 │   │   └── game.ts           # boardgame.io game definition
 │   ├── store/
@@ -78,7 +92,9 @@ SwirledOut/
 │   │   └── index.ts          # TypeScript types
 │   ├── App.tsx
 │   └── main.tsx
-├── .cursor/              # Project context files
+├── public/
+│   └── logo.png              # Site logo
+├── netlify.toml              # Netlify configuration
 └── package.json
 ```
 
