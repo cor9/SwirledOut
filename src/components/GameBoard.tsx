@@ -212,7 +212,10 @@ export default function GameBoard({
       {/* Turn Controls - Always Show When It's Your Turn OR if it's the first player's turn */}
       <div className="mb-6">
         {/* Show controls if it's your turn OR if it's player 0's turn and we're player 0 (fallback for solo/local play) */}
-        {(isMyTurn || (typeof ctx.currentPlayer === "number" && ctx.currentPlayer === 0 && playerIDNum === 0)) ? (
+        {isMyTurn ||
+        (typeof ctx.currentPlayer === "number" &&
+          ctx.currentPlayer === 0 &&
+          playerIDNum === 0) ? (
           <div className="space-y-4">
             {/* Roll Dice Button - Show if no roll yet */}
             {!G.lastRoll && (
@@ -245,7 +248,8 @@ export default function GameBoard({
                   👉 Move {G.lastRoll} Spaces
                 </button>
                 <p className="text-gray-400 text-sm mt-2 text-center">
-                  Click to move your pawn {G.lastRoll} spaces forward on the board
+                  Click to move your pawn {G.lastRoll} spaces forward on the
+                  board
                 </p>
               </div>
             )}
@@ -384,7 +388,13 @@ export default function GameBoard({
       </div>
 
       {/* Players List with Stats */}
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className={`mt-6 grid gap-4 ${
+        G.players.length === 1 
+          ? "grid-cols-1 max-w-md mx-auto" 
+          : G.players.length === 2 
+          ? "grid-cols-2" 
+          : "grid-cols-2 md:grid-cols-4"
+      }`}>
         {G.players.map((player, playerIdx) => {
           const isCurrentPlayer =
             typeof ctx.currentPlayer === "number" &&

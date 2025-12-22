@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Client } from "boardgame.io/react";
 import { Local } from "boardgame.io/multiplayer";
 import { SwirledOutGame } from "../game/game";
@@ -9,26 +9,25 @@ import RulesDisplay from "./RulesDisplay";
 import { useGameStore } from "../store/gameStore";
 import Header from "./Header";
 
-const SwirledOutClient = Client({
-  game: SwirledOutGame,
-  board: GameBoard,
-  multiplayer: Local(),
-  numPlayers: 4,
-});
-
-// Solo play client - 1 player
-const SoloClient = Client({
-  game: SwirledOutGame,
-  board: GameBoard,
-  multiplayer: Local(),
-  numPlayers: 1,
-});
+// Create clients dynamically based on mode
+const createClient = (numPlayers: number) => {
+  return Client({
+    game: SwirledOutGame,
+    board: GameBoard,
+    multiplayer: Local(),
+    numPlayers,
+  });
+};
 
 export default function GameRoom() {
   const { currentRoom, setCurrentRoom, playerName } = useGameStore();
   const [showSetup, setShowSetup] = useState(true);
   const isSolo = currentRoom === "SOLO";
-  const App = isSolo ? SoloClient : SwirledOutClient;
+  
+  // Create the appropriate client based on solo/multiplayer
+  const App = useMemo(() => {
+    return isSolo ? createClient(1) : createClient(4);
+  }, [isSolo]);
 
   useEffect(() => {
     // For solo play, skip setup and start immediately
@@ -109,7 +108,8 @@ export default function GameRoom() {
             {/* Game Board - Takes 2 columns on large screens */}
             <div className="lg:col-span-2">
               <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-purple-500/30 shadow-2xl p-6">
-                <App playerID="0" />
+                {/* Key forces remount when switching between solo/multiplayer */}
+                <App key={isSolo ? "solo" : "multi"} playerID="0" />
               </div>
             </div>
 
