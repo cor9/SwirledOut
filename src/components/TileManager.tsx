@@ -9,7 +9,7 @@ interface TileManagerProps {
   onClose: () => void;
 }
 
-export default function TileManager({ G, ctx, moves, onClose }: TileManagerProps) {
+export default function TileManager({ G, moves, onClose }: TileManagerProps) {
   const [selectedTile, setSelectedTile] = useState<BoardTile | null>(null);
   const [gameMode, setGameMode] = useState<string>("all");
   const [intensity, setIntensity] = useState<string>("all");

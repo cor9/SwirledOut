@@ -31,6 +31,7 @@ export interface BoardTile {
   id: number;
   type: TileType;
   position: number;
+  actionCardId?: string;
   specialEffect?: string;
 }
 

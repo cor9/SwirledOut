@@ -28,9 +28,6 @@ export default function GameBoard({
   const customCards = G.actionDeck.filter((card) =>
     card.id.startsWith("card-")
   );
-  const defaultCards = G.actionDeck.filter(
-    (card) => !card.id.startsWith("card-")
-  );
 
   useEffect(() => {
     if (G.phase === "action" && G.currentAction) {
@@ -128,25 +125,6 @@ export default function GameBoard({
   const handleCategorySelect = (category: CardCategory) => {
     if (moves.drawAction) {
       moves.drawAction(category);
-    }
-  };
-
-  const getTileColor = (tileType: string) => {
-    switch (tileType) {
-      case "start":
-        return "#10B981"; // Green
-      case "finish":
-        return "#EF4444"; // Red
-      case "action":
-        return "#8B5CF6"; // Purple
-      case "punishment":
-        return "#F59E0B"; // Orange
-      case "reward":
-        return "#10B981"; // Green
-      case "wild":
-        return "#EC4899"; // Pink
-      default:
-        return "#4B5563"; // Gray
     }
   };
 
@@ -386,7 +364,7 @@ export default function GameBoard({
                 {/* Player Pawns on Tile */}
                 {playersOnTile.length > 0 && (
                   <div className="absolute -top-2 -right-2 flex gap-1">
-                    {playersOnTile.map((player, pIdx) => (
+                    {playersOnTile.map((player) => (
                       <div
                         key={player.id}
                         className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold"

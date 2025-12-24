@@ -74,11 +74,12 @@ const bgServer = Server({
   games: [SwirledOutGame],
 });
 
-// Mount boardgame.io server
-app.use('/games', bgServer);
+// Mount boardgame.io server - it returns an Express app
+// Type assertion needed due to boardgame.io type definitions mismatch
+app.use('/games', (bgServer.app || bgServer) as unknown as express.Application);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok', webrtc: 'enabled' });
 });
 
