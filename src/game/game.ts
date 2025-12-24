@@ -732,6 +732,8 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       gameState.currentAction = undefined;
       gameState.timerRemaining = undefined;
       gameState.phase = "playing";
+      // Clear lastRoll so next turn can roll again
+      gameState.lastRoll = undefined;
     },
 
     skipAction: (G, ctx) => {
@@ -778,6 +780,8 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       gameState.currentAction = undefined;
       gameState.timerRemaining = undefined;
       gameState.phase = "playing";
+      // Clear lastRoll so next turn can roll again
+      gameState.lastRoll = undefined;
     },
 
     applyPunishment: (G, ctx, punishmentType: string) => {

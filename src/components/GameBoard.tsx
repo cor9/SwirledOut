@@ -70,54 +70,47 @@ export default function GameBoard({
     if (G.lastRoll && canTakeTurn && isRolling && !showDiceRoll) {
       setShowDiceRoll(true);
     }
-    // Reset isRolling if we no longer have a roll (turn ended)
-    if (!G.lastRoll && isRolling) {
+  }, [G.lastRoll, canTakeTurn, isRolling, showDiceRoll]);
+  
+  // Reset rolling state when turn changes
+  useEffect(() => {
+    if (!G.lastRoll) {
       setIsRolling(false);
       setShowDiceRoll(false);
     }
-  }, [G.lastRoll, canTakeTurn, isRolling, showDiceRoll]);
+  }, [ctx.currentPlayer, G.lastRoll]);
 
   const handleMove = () => {
     if (
       canTakeTurn &&
       G.lastRoll &&
-      (G.phase === "playing" || G.phase === "setup")
+      G.phase === "playing"
     ) {
       const currentPlayer = G.players[ctx.currentPlayer];
+      if (!currentPlayer) return;
+      
       const newPosition = Math.min(
         currentPlayer.position + G.lastRoll,
         G.boardSize - 1
       );
+      
+      // Move the pawn
       moves.movePawn(newPosition);
-
-      // Note: movePawn now handles drawing action cards automatically
-      // for tiles with linked actionCardId. For other tile types, we still
-      // need to manually draw actions.
-      const landedTile = G.boardTiles[newPosition];
-
-      // Show tile instruction if available
-      if (landedTile.specialEffect) {
-        // The instruction will be shown in the action modal or we can show it here
-      }
-
-      // Only manually draw if tile doesn't have a linked action card
-      // (movePawn handles tiles with actionCardId automatically)
-      if (!landedTile.actionCardId) {
-        setTimeout(() => {
-          if (moves.drawAction) {
-            if (landedTile.type === "wild") {
-              // Player can choose category for wild tiles
-              moves.drawAction();
-            } else if (landedTile.type === "punishment") {
-              // Draw from punishment deck
-              moves.drawAction("punishment");
-            } else if (landedTile.type === "action") {
-              // Draw random action if no linked card
-              moves.drawAction();
-            }
+      
+      // Clear the roll state and close dice modal
+      setShowDiceRoll(false);
+      setIsRolling(false);
+      
+      // Check what tile we landed on - movePawn handles action cards automatically
+      // If no action was drawn, we can end the turn
+      setTimeout(() => {
+        // If we're still in playing phase (no action drawn), end the turn
+        if (G.phase === "playing" && !G.currentAction) {
+          if (events.endTurn) {
+            events.endTurn();
           }
-        }, 500);
-      }
+        }
+      }, 1000);
     }
   };
 
@@ -126,9 +119,13 @@ export default function GameBoard({
       moves.completeAction();
     }
     setShowActionModal(false);
-    if (events.endTurn) {
-      events.endTurn();
-    }
+    
+    // End turn after completing action
+    setTimeout(() => {
+      if (events.endTurn) {
+        events.endTurn();
+      }
+    }, 300);
   };
 
   const handleSkipAction = () => {
@@ -136,9 +133,13 @@ export default function GameBoard({
       moves.skipAction();
     }
     setShowActionModal(false);
-    if (events.endTurn) {
-      events.endTurn();
-    }
+    
+    // End turn after skipping action
+    setTimeout(() => {
+      if (events.endTurn) {
+        events.endTurn();
+      }
+    }, 300);
   };
 
   const handleSafeWord = () => {
@@ -239,31 +240,53 @@ export default function GameBoard({
         </div>
       )}
 
-      {/* Prominent Dice Roll Button - Always visible when it's your turn and game has started */}
-      {!showStartButton && canTakeTurn && !showDiceRoll && (
-        <div className="mb-6 flex justify-center">
-          {!G.lastRoll && !isRolling ? (
-            <button
-              onClick={handleRollDice}
-              disabled={isRolling}
-              className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-12 py-6 rounded-2xl transition-all transform hover:scale-110 active:scale-95 font-bold text-2xl shadow-2xl border-4 border-white/20 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse"
-            >
-              <span className="flex items-center gap-3">
-                <span className={`text-4xl ${isRolling ? 'animate-spin' : ''}`}>🎲</span>
-                <span>Roll Dice</span>
-              </span>
-            </button>
-          ) : G.lastRoll && !isRolling ? (
-            <button
-              onClick={handleMove}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-6 rounded-2xl transition-all transform hover:scale-110 active:scale-95 font-bold text-2xl shadow-2xl border-4 border-white/20"
-            >
-              <span className="flex items-center gap-3">
-                <span>👉</span>
-                <span>Move {G.lastRoll} Spaces</span>
-              </span>
-            </button>
-          ) : null}
+      {/* Game Controls - Clear step-by-step flow */}
+      {!showStartButton && canTakeTurn && (
+        <div className="mb-6">
+          {/* Step 1: Roll Dice */}
+          {!G.lastRoll && !showDiceRoll && (
+            <div className="flex justify-center">
+              <div className="bg-gray-800/50 rounded-xl p-6 border border-purple-500/30 text-center max-w-md">
+                <div className="text-purple-300 text-sm mb-2">Step 1 of 2</div>
+                <h3 className="text-xl font-bold text-white mb-4">Roll the Dice</h3>
+                <button
+                  onClick={handleRollDice}
+                  disabled={isRolling}
+                  className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-12 py-6 rounded-2xl transition-all transform hover:scale-110 active:scale-95 font-bold text-2xl shadow-2xl border-4 border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="text-4xl">🎲</span>
+                    <span>Roll Dice</span>
+                  </span>
+                </button>
+                <p className="text-gray-400 text-sm mt-3">Roll two dice to see how many spaces you can move</p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Move (shown after dice roll modal closes) */}
+          {G.lastRoll && !showDiceRoll && !isRolling && (
+            <div className="flex justify-center">
+              <div className="bg-gray-800/50 rounded-xl p-6 border border-blue-500/30 text-center max-w-md">
+                <div className="text-blue-300 text-sm mb-2">Step 2 of 2</div>
+                <h3 className="text-xl font-bold text-white mb-4">Move Your Pawn</h3>
+                <div className="bg-blue-600/20 border border-blue-500/50 rounded-lg px-6 py-3 mb-4">
+                  <div className="text-blue-200 text-xs uppercase tracking-wide mb-1">You Rolled</div>
+                  <div className="text-5xl font-bold text-blue-300">{G.lastRoll}</div>
+                </div>
+                <button
+                  onClick={handleMove}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-6 rounded-2xl transition-all transform hover:scale-110 active:scale-95 font-bold text-2xl shadow-2xl border-4 border-white/20 w-full"
+                >
+                  <span className="flex items-center justify-center gap-3">
+                    <span>👉</span>
+                    <span>Move {G.lastRoll} Spaces</span>
+                  </span>
+                </button>
+                <p className="text-gray-400 text-sm mt-3">Click to move your pawn forward on the board</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
