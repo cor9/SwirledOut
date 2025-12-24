@@ -24,8 +24,12 @@ export default function GameBoard({
     undefined
   );
   const playerIDNum = playerID ? parseInt(playerID, 10) : 0;
-  const isMyTurn =
-    typeof ctx.currentPlayer === "number" && ctx.currentPlayer === playerIDNum;
+  const currentPlayerNum = typeof ctx.currentPlayer === "number" ? ctx.currentPlayer : parseInt(String(ctx.currentPlayer || "0"), 10);
+  const isMyTurn = currentPlayerNum === playerIDNum;
+  
+  // In solo mode, always allow player 0 to take actions
+  const isSoloMode = typeof ctx.numPlayers === "number" && ctx.numPlayers === 1;
+  const canTakeTurn = isMyTurn || (isSoloMode && currentPlayerNum === 0);
 
   // Separate custom cards from default cards
   const customCards = G.actionDeck.filter((card) =>
@@ -50,7 +54,7 @@ export default function GameBoard({
   };
 
   const handleRollDice = () => {
-    if (isMyTurn && (G.phase === "playing" || G.phase === "setup") && !isRolling) {
+    if (canTakeTurn && (G.phase === "playing" || G.phase === "setup") && !isRolling) {
       setIsRolling(true);
       setShowDiceRoll(true);
       moves.rollDice();
@@ -63,14 +67,14 @@ export default function GameBoard({
 
   useEffect(() => {
     // Show dice roll modal when a roll happens
-    if (G.lastRoll && isMyTurn) {
+    if (G.lastRoll && canTakeTurn) {
       setShowDiceRoll(true);
     }
-  }, [G.lastRoll, isMyTurn]);
+  }, [G.lastRoll, canTakeTurn]);
 
   const handleMove = () => {
     if (
-      isMyTurn &&
+      canTakeTurn &&
       G.lastRoll &&
       (G.phase === "playing" || G.phase === "setup")
     ) {
@@ -148,7 +152,7 @@ export default function GameBoard({
       {/* Turn Indicator - Prominent */}
       <div
         className={`mb-6 p-4 rounded-xl border-2 ${
-          isMyTurn
+          canTakeTurn
             ? "bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-purple-400 shadow-lg shadow-purple-500/50"
             : "bg-gray-800/50 border-gray-600"
         }`}
@@ -157,14 +161,14 @@ export default function GameBoard({
           <div>
             <h2
               className={`text-3xl font-bold ${
-                isMyTurn ? "text-white" : "text-gray-400"
+                canTakeTurn ? "text-white" : "text-gray-400"
               }`}
             >
-              {isMyTurn
+              {canTakeTurn
                 ? "🎲 YOUR TURN - Take Action!"
                 : `⏳ Player ${ctx.currentPlayer + 1}'s Turn`}
             </h2>
-            {isMyTurn && (
+            {canTakeTurn && (
               <p className="text-purple-200 text-sm mt-1">
                 Roll the dice to begin your turn
               </p>
@@ -231,10 +235,7 @@ export default function GameBoard({
       )}
 
       {/* Prominent Dice Roll Button - Always visible when it's your turn and game has started */}
-      {!showStartButton && (isMyTurn ||
-        (typeof ctx.currentPlayer === "number" &&
-          ctx.currentPlayer === 0 &&
-          playerIDNum === 0)) && (
+      {!showStartButton && canTakeTurn && (
         <div className="mb-6 flex justify-center">
           {!G.lastRoll ? (
             <button
@@ -262,10 +263,7 @@ export default function GameBoard({
       )}
 
       {/* Waiting Message for Other Players */}
-      {!(isMyTurn ||
-        (typeof ctx.currentPlayer === "number" &&
-          ctx.currentPlayer === 0 &&
-          playerIDNum === 0)) && (
+      {!showStartButton && !canTakeTurn && (
         <div className="mb-6 bg-gray-800/50 rounded-xl p-6 border border-gray-600 text-center">
           <p className="text-gray-400 text-lg mb-2">
             Waiting for Player {ctx.currentPlayer + 1} to take their turn...
@@ -371,7 +369,7 @@ export default function GameBoard({
                         : `#${tile.position + 1}: ${tile.type.charAt(0).toUpperCase() + tile.type.slice(1)}${tile.specialEffect ? ` - ${tile.specialEffect}` : ""}`}
                     </title>
                   </circle>
-                  
+
                   {/* Tile number/label - Larger text */}
                   <text
                     x={x}
@@ -390,7 +388,7 @@ export default function GameBoard({
                     const offsetAngle = (pIdx - (playersOnTile.length - 1) / 2) * 0.6;
                     const pawnX = x + Math.cos(offsetAngle) * 25;
                     const pawnY = y + Math.sin(offsetAngle) * 25;
-                    
+
                     return (
                       <g key={player.id}>
                         <circle
