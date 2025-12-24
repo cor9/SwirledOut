@@ -42,6 +42,16 @@ export interface GameRules {
   defaultTimerSeconds: number;
 }
 
+export interface GameEvent {
+  id: string;
+  timestamp: number;
+  type: "roll" | "move" | "action" | "complete" | "skip" | "punishment" | "reward";
+  playerId: string;
+  playerName: string;
+  message: string;
+  data?: any;
+}
+
 export interface SwirledOutGameState {
   players: Array<{
     id: string;
@@ -63,11 +73,220 @@ export interface SwirledOutGameState {
   timerRemaining?: number;
   gameRules: GameRules;
   winner?: string;
+  activityLog: GameEvent[];
 }
 
 // Default card decks with categories
 const createDefaultDecks = () => {
   const actionDeck: ActionCard[] = [
+    // Bating cards (detailed instructions)
+    {
+      id: "b1",
+      text: "30 slow touches to your (genital)",
+      category: "dare",
+      intensity: "mild",
+      timerSeconds: 30,
+    },
+    {
+      id: "b2",
+      text: "Time your touches with your breathing until your next turn",
+      category: "dare",
+      intensity: "mild",
+    },
+    {
+      id: "b3",
+      text: "Touch as fast as you can for 30 seconds",
+      category: "dare",
+      intensity: "medium",
+      timerSeconds: 30,
+    },
+    {
+      id: "b4",
+      text: "Alternate between fast and slow touches until another Bating action",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b5",
+      text: "Stimulate yourself until your next turn while using your other hand on an erogenous zone",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b6",
+      text: "Use two fingers and focus on sensitive areas of your (genital)",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b7",
+      text: "Perform a kegel with every touch until your next turn",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b8",
+      text: "Experiment with different touches and pressures while masturbating",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b9",
+      text: "Touch with your non-dominant hand",
+      category: "dare",
+      intensity: "mild",
+    },
+    {
+      id: "b10",
+      text: "Play with your (genital)",
+      category: "dare",
+      intensity: "mild",
+    },
+    {
+      id: "b11",
+      text: "Spit on your (genital)",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b12",
+      text: "30 firm squeezes to your (genital)",
+      category: "dare",
+      intensity: "medium",
+      timerSeconds: 30,
+    },
+    {
+      id: "b13",
+      text: "Touch your (genital) with a circular motion",
+      category: "dare",
+      intensity: "mild",
+    },
+    {
+      id: "b14",
+      text: "Edge with your non-dominant hand",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b15",
+      text: "Shift positions (stand, kneel, sit) while edging yourself",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b16",
+      text: "Bring yourself to the edge",
+      category: "dare",
+      intensity: "intense",
+    },
+    {
+      id: "b17",
+      text: "Get to the edge as fast as possible",
+      category: "dare",
+      intensity: "intense",
+    },
+    {
+      id: "b18",
+      text: "Get to the edge twice",
+      category: "dare",
+      intensity: "intense",
+    },
+    {
+      id: "b19",
+      text: "Edge using only a few fingers",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b20",
+      text: "Edge using your whole hand",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b21",
+      text: "Practice breath control by holding your breath while edging",
+      category: "dare",
+      intensity: "intense",
+    },
+    {
+      id: "b22",
+      text: "Rapidly stimulate to the edge, then hold a kegel as long as possible",
+      category: "dare",
+      intensity: "intense",
+    },
+    {
+      id: "b23",
+      text: "Touch yourself as quickly as you can until your next turn",
+      category: "dare",
+      intensity: "medium",
+    },
+    {
+      id: "b24",
+      text: "Touch yourself below your (genital) while edging",
+      category: "dare",
+      intensity: "medium",
+    },
+
+    // Tit Torture cards
+    {
+      id: "tt1",
+      text: "Hit 5 seconds. Hold 5 seconds. Twist your tits in both directions",
+      category: "dare",
+      intensity: "medium",
+      timerSeconds: 15,
+    },
+    {
+      id: "tt2",
+      text: "Hit 5 seconds. Hold 5 seconds. Pinch your tits hard",
+      category: "dare",
+      intensity: "intense",
+      timerSeconds: 15,
+    },
+    {
+      id: "tt3",
+      text: "5 quick hits. Rub your tits for 15 seconds",
+      category: "dare",
+      intensity: "medium",
+      timerSeconds: 20,
+    },
+    {
+      id: "tt4",
+      text: "8 hits. Twist your tits hard",
+      category: "dare",
+      intensity: "intense",
+    },
+
+    // Throat Training cards
+    {
+      id: "th1",
+      text: "Practice deep breathing for 30 seconds",
+      category: "challenge",
+      intensity: "mild",
+      timerSeconds: 30,
+    },
+    {
+      id: "th2",
+      text: "Hold your breath for 15 seconds",
+      category: "challenge",
+      intensity: "medium",
+      timerSeconds: 15,
+    },
+
+    // Rating cards
+    {
+      id: "r1",
+      text: "Rate your current arousal level (1-10)",
+      category: "truth",
+      intensity: "mild",
+    },
+    {
+      id: "r2",
+      text: "Describe what you're feeling right now",
+      category: "truth",
+      intensity: "mild",
+    },
+
     // Truth cards
     {
       id: "t1",
@@ -86,35 +305,6 @@ const createDefaultDecks = () => {
       text: "What's something you've never told anyone?",
       category: "truth",
       intensity: "intense",
-    },
-
-    // Dare cards
-    {
-      id: "d1",
-      text: "Dance for 30 seconds",
-      category: "dare",
-      intensity: "mild",
-      timerSeconds: 30,
-    },
-    {
-      id: "d2",
-      text: "Sing a song of your choice",
-      category: "dare",
-      intensity: "medium",
-      timerSeconds: 60,
-    },
-    {
-      id: "d3",
-      text: "Do your best impression of another player",
-      category: "dare",
-      intensity: "medium",
-    },
-    {
-      id: "d4",
-      text: "Complete a physical challenge",
-      category: "dare",
-      intensity: "intense",
-      timerSeconds: 120,
     },
 
     // Challenge cards
@@ -188,12 +378,13 @@ const createDefaultDecks = () => {
 };
 
 // Create board tiles with special spaces
-const createBoardTiles = (boardSize: number): BoardTile[] => {
+const createBoardTiles = (boardSize: number, actionDeck: ActionCard[]): BoardTile[] => {
   const tiles: BoardTile[] = [];
 
   for (let i = 0; i < boardSize; i++) {
     let type: TileType = "normal";
     let specialEffect: string | undefined;
+    let actionCardId: string | undefined;
 
     // Start tile
     if (i === 0) {
@@ -203,22 +394,31 @@ const createBoardTiles = (boardSize: number): BoardTile[] => {
     else if (i === boardSize - 1) {
       type = "finish";
     }
-    // Special tiles at intervals
-    else if (i % 5 === 0) {
-      const specialTypes: TileType[] = [
-        "action",
-        "punishment",
-        "reward",
-        "wild",
-      ];
-      type = specialTypes[(i / 5) % specialTypes.length];
-      if (type === "punishment") {
-        specialEffect = "Draw a punishment card";
-      } else if (type === "reward") {
-        specialEffect = "Move forward 2 spaces";
-      } else if (type === "wild") {
-        specialEffect = "Choose any category";
+    // Special tiles at intervals - assign specific action cards
+    else if (i % 3 === 0) {
+      // Every 3rd tile gets an action card
+      type = "action";
+      // Assign a random action card from the deck
+      if (actionDeck.length > 0) {
+        const cardIndex = i % actionDeck.length;
+        actionCardId = actionDeck[cardIndex].id;
+        specialEffect = actionDeck[cardIndex].text;
       }
+    }
+    // Punishment tiles
+    else if (i % 7 === 0) {
+      type = "punishment";
+      specialEffect = "Draw a punishment card";
+    }
+    // Reward tiles
+    else if (i % 9 === 0) {
+      type = "reward";
+      specialEffect = "Move forward 2 spaces";
+    }
+    // Wild tiles
+    else if (i % 11 === 0) {
+      type = "wild";
+      specialEffect = "Choose any category";
     }
 
     tiles.push({
@@ -226,6 +426,7 @@ const createBoardTiles = (boardSize: number): BoardTile[] => {
       type,
       position: i,
       specialEffect,
+      actionCardId,
     });
   }
 
@@ -250,25 +451,34 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
     // Thanks to the numPlayers property in the game config above
     // BUT: If it's still undefined (boardgame.io 0.50.2 bug), use fallback logic
     let numPlayers = ctx.numPlayers;
-    
+
     // FALLBACK: If ctx.numPlayers is undefined, detect solo from playOrder
     if (typeof numPlayers !== "number" || numPlayers <= 0) {
       const existingPlayOrder = ctx.playOrder as string[] | undefined;
-      if (existingPlayOrder && existingPlayOrder.length === 1 && existingPlayOrder[0] === "0") {
+      if (
+        existingPlayOrder &&
+        existingPlayOrder.length === 1 &&
+        existingPlayOrder[0] === "0"
+      ) {
         // Solo mode: playOrder is ["0"]
         numPlayers = 1;
-        console.log("[Game Setup] Fallback: Solo detected from playOrder ['0'], forcing numPlayers to 1");
+        console.log(
+          "[Game Setup] Fallback: Solo detected from playOrder ['0'], forcing numPlayers to 1"
+        );
       } else if (existingPlayOrder && existingPlayOrder.length > 0) {
         // Multiplayer: use playOrder length
         numPlayers = existingPlayOrder.length;
-        console.log("[Game Setup] Fallback: Using playOrder length:", numPlayers);
+        console.log(
+          "[Game Setup] Fallback: Using playOrder length:",
+          numPlayers
+        );
       } else {
         // Last resort: default to 4
         numPlayers = 4;
         console.log("[Game Setup] Fallback: Defaulting to 4 players");
       }
     }
-    
+
     console.log(
       "[Game Setup] ctx.numPlayers:",
       ctx.numPlayers,
@@ -290,8 +500,8 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       playOrder
     );
 
-    const boardSize = 30; // Longer board for more gameplay
-    const boardTiles = createBoardTiles(boardSize);
+    const boardSize = 42; // Match BlitzedOut board size
+    const boardTiles = createBoardTiles(boardSize, actionDeck);
 
     return {
       players: playOrder.map((id: string, idx: number) => ({
@@ -320,6 +530,7 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
         defaultTimerSeconds: 60,
       },
       winner: undefined,
+      activityLog: [],
     };
   },
 
@@ -340,6 +551,20 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       if (gameState.phase === "setup") {
         gameState.phase = "playing";
       }
+
+      // Log roll event
+      const player = gameState.players[ctx.currentPlayer];
+      if (player) {
+        gameState.activityLog.push({
+          id: `event-${Date.now()}-${Math.random()}`,
+          timestamp: Date.now(),
+          type: "roll",
+          playerId: player.id,
+          playerName: player.name,
+          message: `Roll: ${gameState.lastRoll}`,
+          data: { roll: gameState.lastRoll },
+        });
+      }
     },
 
     movePawn: (G, ctx, position: number) => {
@@ -347,8 +572,21 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       const player = gameState.players[ctx.currentPlayer];
       if (!player) return;
 
+      const oldPosition = player.position;
       const newPosition = Math.min(position, gameState.boardSize - 1);
       gameState.players[ctx.currentPlayer].position = newPosition;
+
+      // Log move event
+      const currentTile = gameState.boardTiles[newPosition];
+      gameState.activityLog.push({
+        id: `event-${Date.now()}-${Math.random()}`,
+        timestamp: Date.now(),
+        type: "move",
+        playerId: player.id,
+        playerName: player.name,
+        message: `#${newPosition + 1}: ${currentTile.type === "start" ? "START" : currentTile.type === "finish" ? "FINISH" : currentTile.type.charAt(0).toUpperCase() + currentTile.type.slice(1)}`,
+        data: { from: oldPosition, to: newPosition, tile: currentTile },
+      });
 
       // Check if player reached the end
       if (newPosition >= gameState.boardSize - 1) {
@@ -358,7 +596,6 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       }
 
       // Check for special tile effects
-      const currentTile = gameState.boardTiles[newPosition];
       if (currentTile.type === "reward" && currentTile.specialEffect) {
         // Move forward 2 more spaces
         const rewardPosition = Math.min(
@@ -366,6 +603,29 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
           gameState.boardSize - 1
         );
         gameState.players[ctx.currentPlayer].position = rewardPosition;
+      } else if (currentTile.type === "action" && currentTile.actionCardId) {
+        // Draw the specific action card linked to this tile
+        const linkedCard = gameState.actionDeck.find(
+          (card) => card.id === currentTile.actionCardId
+        );
+        if (linkedCard) {
+          gameState.currentAction = linkedCard;
+          gameState.phase = "action";
+          if (gameState.gameRules.timerEnabled) {
+            gameState.timerRemaining =
+              linkedCard.timerSeconds || gameState.gameRules.defaultTimerSeconds;
+          }
+          // Log action event
+          gameState.activityLog.push({
+            id: `event-${Date.now()}-${Math.random()}`,
+            timestamp: Date.now(),
+            type: "action",
+            playerId: player.id,
+            playerName: player.name,
+            message: `Action: ${linkedCard.text}`,
+            data: { card: linkedCard, tile: currentTile },
+          });
+        }
       } else if (
         currentTile.type === "punishment" &&
         currentTile.specialEffect
@@ -416,6 +676,20 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
         gameState.timerRemaining =
           drawnCard.timerSeconds || gameState.gameRules.defaultTimerSeconds;
       }
+
+      // Log action event
+      const player = gameState.players[ctx.currentPlayer];
+      if (player) {
+        gameState.activityLog.push({
+          id: `event-${Date.now()}-${Math.random()}`,
+          timestamp: Date.now(),
+          type: "action",
+          playerId: player.id,
+          playerName: player.name,
+          message: `Action: ${drawnCard.text}`,
+          data: { card: drawnCard },
+        });
+      }
     },
 
     completeAction: (G, ctx) => {
@@ -423,23 +697,36 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       const player = gameState.players[ctx.currentPlayer];
       if (!player || !gameState.currentAction) return;
 
+      const completedCard = gameState.currentAction;
+
       // Award points/reward
       player.completedActions += 1;
       player.score +=
-        gameState.currentAction.intensity === "mild"
+        completedCard.intensity === "mild"
           ? 1
-          : gameState.currentAction.intensity === "medium"
+          : completedCard.intensity === "medium"
           ? 2
           : 3;
 
       // Apply reward if card has one
-      if (gameState.currentAction.reward) {
+      if (completedCard.reward) {
         // Handle reward (e.g., move forward, bonus points)
-        if (gameState.currentAction.reward.includes("forward")) {
+        if (completedCard.reward.includes("forward")) {
           const newPos = Math.min(player.position + 2, gameState.boardSize - 1);
           gameState.players[ctx.currentPlayer].position = newPos;
         }
       }
+
+      // Log complete event before clearing
+      gameState.activityLog.push({
+        id: `event-${Date.now()}-${Math.random()}`,
+        timestamp: Date.now(),
+        type: "complete",
+        playerId: player.id,
+        playerName: player.name,
+        message: `Completed: ${completedCard.text}`,
+        data: { card: completedCard },
+      });
 
       gameState.currentAction = undefined;
       gameState.timerRemaining = undefined;
@@ -451,10 +738,12 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       const player = gameState.players[ctx.currentPlayer];
       if (!player || !gameState.currentAction) return;
 
+      const skippedCard = gameState.currentAction;
+
       // Apply punishment if enabled
       if (
         gameState.gameRules.punishmentOnSkip &&
-        gameState.currentAction.punishment
+        skippedCard.punishment
       ) {
         player.punishments += 1;
 
@@ -473,6 +762,17 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
           }
         }
       }
+
+      // Log skip event before clearing
+      gameState.activityLog.push({
+        id: `event-${Date.now()}-${Math.random()}`,
+        timestamp: Date.now(),
+        type: "skip",
+        playerId: player.id,
+        playerName: player.name,
+        message: `Skipped: ${skippedCard.text}`,
+        data: { card: skippedCard },
+      });
 
       gameState.currentAction = undefined;
       gameState.timerRemaining = undefined;
@@ -538,6 +838,38 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
     updateRules: (G, _ctx, rules: Partial<GameRules>) => {
       const gameState = G as unknown as SwirledOutGameState;
       gameState.gameRules = { ...gameState.gameRules, ...rules };
+    },
+
+    addGameEvent: (G, _ctx, event: GameEvent) => {
+      const gameState = G as unknown as SwirledOutGameState;
+      gameState.activityLog.push(event);
+      // Keep only last 100 events
+      if (gameState.activityLog.length > 100) {
+        gameState.activityLog = gameState.activityLog.slice(-100);
+      }
+    },
+
+    updateBoardTile: (G, _ctx, tileId: number, updates: Partial<BoardTile>) => {
+      const gameState = G as unknown as SwirledOutGameState;
+      const tileIndex = gameState.boardTiles.findIndex(t => t.id === tileId);
+      if (tileIndex >= 0) {
+        gameState.boardTiles[tileIndex] = {
+          ...gameState.boardTiles[tileIndex],
+          ...updates,
+        };
+      }
+    },
+
+    addBoardTile: (G, _ctx, tile: BoardTile) => {
+      const gameState = G as unknown as SwirledOutGameState;
+      gameState.boardTiles.push(tile);
+      gameState.boardSize = gameState.boardTiles.length;
+    },
+
+    removeBoardTile: (G, _ctx, tileId: number) => {
+      const gameState = G as unknown as SwirledOutGameState;
+      gameState.boardTiles = gameState.boardTiles.filter(t => t.id !== tileId);
+      gameState.boardSize = gameState.boardTiles.length;
     },
   },
 

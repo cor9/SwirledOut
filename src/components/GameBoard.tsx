@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { BoardProps } from "boardgame.io/react";
-import { SwirledOutGameState, CardCategory } from "../game/game";
+import { SwirledOutGameState, CardCategory, ActionCard } from "../game/game";
 import ActionModal from "./ActionModal";
 import CardEditor from "./CardEditor";
+import ActivityLog from "./ActivityLog";
+import TileManager from "./TileManager";
 
 export default function GameBoard({
   G,
@@ -13,9 +15,22 @@ export default function GameBoard({
 }: BoardProps<SwirledOutGameState>) {
   const [showActionModal, setShowActionModal] = useState(false);
   const [showCardEditor, setShowCardEditor] = useState(false);
+  const [showCardManager, setShowCardManager] = useState(false);
+  const [showTileManager, setShowTileManager] = useState(false);
+  const [editingCard, setEditingCard] = useState<ActionCard | undefined>(
+    undefined
+  );
   const playerIDNum = playerID ? parseInt(playerID, 10) : 0;
   const isMyTurn =
     typeof ctx.currentPlayer === "number" && ctx.currentPlayer === playerIDNum;
+
+  // Separate custom cards from default cards
+  const customCards = G.actionDeck.filter((card) =>
+    card.id.startsWith("card-")
+  );
+  const defaultCards = G.actionDeck.filter(
+    (card) => !card.id.startsWith("card-")
+  );
 
   useEffect(() => {
     if (G.phase === "action" && G.currentAction) {
@@ -57,24 +72,29 @@ export default function GameBoard({
       );
       moves.movePawn(newPosition);
 
-      // Check what type of tile we landed on
+      // Note: movePawn now handles drawing action cards automatically
+      // for tiles with linked actionCardId. For other tile types, we still
+      // need to manually draw actions.
       const landedTile = G.boardTiles[newPosition];
 
-      // Draw action card when landing
-      setTimeout(() => {
-        if (moves.drawAction) {
-          if (landedTile.type === "wild") {
-            // Player can choose category for wild tiles
-            // For now, draw random
-            moves.drawAction();
-          } else if (landedTile.type === "punishment") {
-            // Draw from punishment deck
-            moves.drawAction("punishment");
-          } else {
-            moves.drawAction();
+      // Only manually draw if tile doesn't have a linked action card
+      // (movePawn handles tiles with actionCardId automatically)
+      if (!landedTile.actionCardId) {
+        setTimeout(() => {
+          if (moves.drawAction) {
+            if (landedTile.type === "wild") {
+              // Player can choose category for wild tiles
+              moves.drawAction();
+            } else if (landedTile.type === "punishment") {
+              // Draw from punishment deck
+              moves.drawAction("punishment");
+            } else if (landedTile.type === "action") {
+              // Draw random action if no linked card
+              moves.drawAction();
+            }
           }
-        }
-      }, 500);
+        }, 500);
+      }
     }
   };
 
@@ -174,7 +194,7 @@ export default function GameBoard({
       </div>
 
       {/* Game Stats */}
-      <div className="grid grid-cols-3 gap-4 text-sm mb-6">
+      <div className="grid grid-cols-4 gap-4 text-sm mb-6">
         <div className="bg-gray-700/50 rounded-lg p-3">
           <div className="text-gray-400">Board Size</div>
           <div className="text-white font-bold">{G.boardSize} tiles</div>
@@ -188,6 +208,14 @@ export default function GameBoard({
           <div className="text-white font-bold capitalize">
             {G.gameRules.winCondition.replace(/_/g, " ")}
           </div>
+        </div>
+        <div className="bg-gray-700/50 rounded-lg p-3 flex items-center">
+          <button
+            onClick={() => setShowTileManager(true)}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+          >
+            🗺️ Manage Tiles
+          </button>
         </div>
       </div>
 
@@ -280,10 +308,19 @@ export default function GameBoard({
                     ⚡ Challenge
                   </button>
                   <button
-                    onClick={() => setShowCardEditor(true)}
+                    onClick={() => {
+                      setEditingCard(undefined);
+                      setShowCardEditor(true);
+                    }}
                     className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
                   >
                     ➕ Add Card
+                  </button>
+                  <button
+                    onClick={() => setShowCardManager(true)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                  >
+                    📋 My Cards ({customCards.length})
                   </button>
                 </div>
               </div>
@@ -301,90 +338,91 @@ export default function GameBoard({
         )}
       </div>
 
-      {/* Board */}
-      <div className="relative bg-gray-900/50 rounded-xl p-8 border-2 border-purple-500/30">
-        <svg viewBox="0 0 800 600" className="w-full h-auto">
-          {/* Draw board path */}
-          <path
-            d="M 50 300 L 200 300 L 200 100 L 500 100 L 500 300 L 750 300 L 750 500 L 500 500 L 500 400 L 200 400 L 200 500 L 50 500 Z"
-            fill="none"
-            stroke="#7C3AED"
-            strokeOpacity="0.5"
-            strokeWidth="4"
-          />
-
-          {/* Board tiles */}
-          {G.boardTiles.map((tile) => {
-            const progress = tile.position / (G.boardSize - 1);
-            const angle = progress * Math.PI * 2;
-            const radius = 200;
-            const x = 400 + Math.cos(angle) * radius;
-            const y = 300 + Math.sin(angle) * radius;
+      {/* Board and Activity Log Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        {/* Linear Board */}
+        <div className="lg:col-span-3 relative bg-gray-900/50 rounded-xl p-6 border-2 border-purple-500/30 overflow-x-auto">
+        <div className="flex items-center gap-2 min-w-max" style={{ width: `${G.boardSize * 60}px` }}>
+          {G.boardTiles.map((tile, idx) => {
+            const isOccupied = G.players.some(p => p.position === tile.position);
+            const playersOnTile = G.players.filter(p => p.position === tile.position);
 
             return (
-              <circle
-                key={tile.id}
-                cx={x}
-                cy={y}
-                r="18"
-                fill={getTileColor(tile.type)}
-                stroke={
-                  tile.type === "start" || tile.type === "finish"
-                    ? "#059669"
-                    : "#7C3AED"
-                }
-                strokeOpacity="0.6"
-                strokeWidth="3"
-              >
-                <title>
-                  {tile.type === "start"
-                    ? "Start"
-                    : tile.type === "finish"
-                    ? "Finish"
-                    : tile.type.charAt(0).toUpperCase() + tile.type.slice(1)}
-                  {tile.specialEffect ? ` - ${tile.specialEffect}` : ""}
-                </title>
-              </circle>
+              <div key={tile.id} className="relative flex-shrink-0">
+                {/* Tile */}
+                <div
+                  className={`w-14 h-14 rounded-lg border-2 flex items-center justify-center font-bold text-xs transition-all ${
+                    tile.type === "start"
+                      ? "bg-green-600 border-green-400 text-white"
+                      : tile.type === "finish"
+                      ? "bg-red-600 border-red-400 text-white"
+                      : tile.type === "action"
+                      ? "bg-purple-600 border-purple-400 text-white"
+                      : tile.type === "punishment"
+                      ? "bg-orange-600 border-orange-400 text-white"
+                      : tile.type === "reward"
+                      ? "bg-green-500 border-green-300 text-white"
+                      : tile.type === "wild"
+                      ? "bg-pink-600 border-pink-400 text-white"
+                      : "bg-gray-600 border-gray-400 text-white"
+                  } ${isOccupied ? "ring-2 ring-yellow-400 ring-offset-2" : ""}`}
+                  title={
+                    tile.type === "start"
+                      ? "START"
+                      : tile.type === "finish"
+                      ? "FINISH"
+                      : `#${tile.position + 1}: ${tile.type.charAt(0).toUpperCase() + tile.type.slice(1)}${tile.specialEffect ? ` - ${tile.specialEffect}` : ""}`
+                  }
+                >
+                  {tile.type === "start" ? (
+                    <span className="text-xs">START</span>
+                  ) : tile.type === "finish" ? (
+                    <span className="text-xs">END</span>
+                  ) : (
+                    <span>{tile.position + 1}</span>
+                  )}
+                </div>
+
+                {/* Player Pawns on Tile */}
+                {playersOnTile.length > 0 && (
+                  <div className="absolute -top-2 -right-2 flex gap-1">
+                    {playersOnTile.map((player, pIdx) => (
+                      <div
+                        key={player.id}
+                        className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold"
+                        style={{ backgroundColor: player.color }}
+                        title={`${player.name} - Position: ${player.position}`}
+                      >
+                        {G.players.findIndex(p => p.id === player.id) + 1}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Arrow between tiles (except last) */}
+                {idx < G.boardTiles.length - 1 && (
+                  <div className="absolute top-1/2 -right-3 transform -translate-y-1/2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M9 18L15 12L9 6"
+                        stroke="#7C3AED"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
             );
           })}
+        </div>
+        </div>
 
-          {/* Player pawns */}
-          {G.players.map((player) => {
-            const progress = player.position / (G.boardSize - 1);
-            const angle = progress * Math.PI * 2;
-            const radius = 200;
-            const x = 400 + Math.cos(angle) * radius;
-            const y = 300 + Math.sin(angle) * radius;
-
-            return (
-              <g key={player.id}>
-                <circle
-                  cx={x}
-                  cy={y}
-                  r="25"
-                  fill={player.color}
-                  stroke="white"
-                  strokeWidth="4"
-                >
-                  <title>
-                    {player.name} - Position: {player.position} - Score:{" "}
-                    {player.score} - Completed: {player.completedActions}
-                  </title>
-                </circle>
-                <text
-                  x={x}
-                  y={y + 5}
-                  textAnchor="middle"
-                  fill="white"
-                  fontSize="12"
-                  fontWeight="bold"
-                >
-                  {G.players.indexOf(player) + 1}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
+        {/* Activity Log */}
+        <div className="lg:col-span-1">
+          <ActivityLog events={G.activityLog || []} />
+        </div>
       </div>
 
       {/* Debug info */}
@@ -488,14 +526,145 @@ export default function GameBoard({
       {/* Card Editor */}
       {showCardEditor && (
         <CardEditor
+          existingCard={editingCard}
           onSave={(card) => {
             if (moves.addCustomCard) {
               moves.addCustomCard(card);
             }
             setShowCardEditor(false);
+            setEditingCard(undefined);
           }}
-          onClose={() => setShowCardEditor(false)}
+          onClose={() => {
+            setShowCardEditor(false);
+            setEditingCard(undefined);
+          }}
         />
+      )}
+
+      {/* Tile Manager Modal */}
+      {showTileManager && (
+        <TileManager
+          G={G}
+          ctx={ctx}
+          moves={moves}
+          onClose={() => setShowTileManager(false)}
+        />
+      )}
+
+      {/* Card Manager Modal */}
+      {showCardManager && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-2xl p-8 max-w-4xl w-full border-2 border-purple-500/50 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">
+                Your Custom Cards ({customCards.length})
+              </h2>
+              <button
+                onClick={() => setShowCardManager(false)}
+                className="text-gray-400 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            {customCards.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400 text-lg mb-4">
+                  You haven't created any custom cards yet.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowCardManager(false);
+                    setEditingCard(undefined);
+                    setShowCardEditor(true);
+                  }}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105 font-medium"
+                >
+                  Create Your First Card
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {customCards.map((card) => {
+                  const intensityColors = {
+                    mild: "bg-green-900/40 border-green-500/50",
+                    medium: "bg-yellow-900/40 border-yellow-500/50",
+                    intense: "bg-red-900/40 border-red-500/50",
+                  };
+                  const categoryIcons = {
+                    truth: "💭",
+                    dare: "🎯",
+                    challenge: "⚡",
+                    punishment: "⚠️",
+                    reward: "🎁",
+                    wild: "🌟",
+                  };
+
+                  return (
+                    <div
+                      key={card.id}
+                      className="bg-gray-700/50 rounded-lg p-4 border border-gray-600"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">
+                            {categoryIcons[card.category]}
+                          </span>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-bold uppercase ${
+                              intensityColors[card.intensity]
+                            } text-white`}
+                          >
+                            {card.intensity}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setEditingCard(card);
+                            setShowCardManager(false);
+                            setShowCardEditor(true);
+                          }}
+                          className="text-purple-400 hover:text-purple-300 text-sm"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                      <p className="text-white font-medium mb-2">{card.text}</p>
+                      <div className="text-xs text-gray-400 space-y-1">
+                        {card.timerSeconds && (
+                          <div>⏱️ Timer: {card.timerSeconds}s</div>
+                        )}
+                        {card.punishment && (
+                          <div>⚠️ Punishment: {card.punishment}</div>
+                        )}
+                        {card.reward && <div>🎁 Reward: {card.reward}</div>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => {
+                  setShowCardManager(false);
+                  setEditingCard(undefined);
+                  setShowCardEditor(true);
+                }}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg"
+              >
+                ➕ Add New Card
+              </button>
+              <button
+                onClick={() => setShowCardManager(false)}
+                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Game Finished Modal */}

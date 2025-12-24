@@ -6,6 +6,7 @@ import GameBoard from "./GameBoard";
 import VideoChat from "./VideoChat";
 import GameSetup, { GameConfig } from "./GameSetup";
 import RulesDisplay from "./RulesDisplay";
+import ActivityLog from "./ActivityLog";
 import { useGameStore } from "../store/gameStore";
 import Header from "./Header";
 
