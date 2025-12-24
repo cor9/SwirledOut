@@ -552,7 +552,7 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       if (gameState.phase === "setup") {
         gameState.phase = "playing";
       }
-      
+
       // Log roll event
       const player = gameState.players[ctx.currentPlayer];
       if (player) {

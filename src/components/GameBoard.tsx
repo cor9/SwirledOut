@@ -85,12 +85,12 @@ export default function GameBoard({
       // for tiles with linked actionCardId. For other tile types, we still
       // need to manually draw actions.
       const landedTile = G.boardTiles[newPosition];
-      
+
       // Show tile instruction if available
       if (landedTile.specialEffect) {
         // The instruction will be shown in the action modal or we can show it here
       }
-      
+
       // Only manually draw if tile doesn't have a linked action card
       // (movePawn handles tiles with actionCardId automatically)
       if (!landedTile.actionCardId) {
@@ -288,13 +288,13 @@ export default function GameBoard({
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            
+
             {/* Board tiles positioned along the path */}
             {G.boardTiles.map((tile) => {
               const progress = tile.position / (G.boardSize - 1);
               let x = 50;
               let y = 300;
-              
+
               // Calculate position along winding path
               if (progress < 0.15) {
                 // First straight section
@@ -331,10 +331,10 @@ export default function GameBoard({
                   y = 150 + ((finalProgress - 0.5) / 0.5) * 150;
                 }
               }
-              
+
               const isOccupied = G.players.some(p => p.position === tile.position);
               const playersOnTile = G.players.filter(p => p.position === tile.position);
-              
+
               const getTileColor = () => {
                 switch (tile.type) {
                   case "start": return "#10B981";
@@ -346,7 +346,7 @@ export default function GameBoard({
                   default: return "#4B5563";
                 }
               };
-              
+
               return (
                 <g key={tile.id}>
                   {/* Tile circle */}
@@ -368,7 +368,7 @@ export default function GameBoard({
                         : `#${tile.position + 1}: ${tile.type.charAt(0).toUpperCase() + tile.type.slice(1)}${tile.specialEffect ? ` - ${tile.specialEffect}` : ""}`}
                     </title>
                   </circle>
-                  
+
                   {/* Tile number/label */}
                   <text
                     x={x}
@@ -381,13 +381,13 @@ export default function GameBoard({
                   >
                     {tile.type === "start" ? "S" : tile.type === "finish" ? "F" : tile.position + 1}
                   </text>
-                  
+
                   {/* Player pawns */}
                   {playersOnTile.map((player, pIdx) => {
                     const offsetAngle = (pIdx - (playersOnTile.length - 1) / 2) * 0.5;
                     const pawnX = x + Math.cos(offsetAngle) * 15;
                     const pawnY = y + Math.sin(offsetAngle) * 15;
-                    
+
                     return (
                       <g key={player.id}>
                         <circle
