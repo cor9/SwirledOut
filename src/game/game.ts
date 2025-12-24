@@ -552,7 +552,7 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
       if (gameState.phase === "setup") {
         gameState.phase = "playing";
       }
-
+      
       // Log roll event
       const player = gameState.players[ctx.currentPlayer];
       if (player) {
@@ -562,8 +562,8 @@ export const SwirledOutGame: Game<SwirledOutGameState> & {
           type: "roll",
           playerId: player.id,
           playerName: player.name,
-          message: `Roll: ${gameState.lastRoll}`,
-          data: { roll: gameState.lastRoll },
+          message: `Roll: ${die1} + ${die2} = ${gameState.lastRoll}`,
+          data: { roll: gameState.lastRoll, die1, die2 },
         });
       }
     },

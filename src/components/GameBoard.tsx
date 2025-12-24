@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { BoardProps } from "boardgame.io/react";
-import { SwirledOutGameState, CardCategory, ActionCard } from "../game/game";
+import { SwirledOutGameState, ActionCard } from "../game/game";
 import ActionModal from "./ActionModal";
 import CardEditor from "./CardEditor";
 import ActivityLog from "./ActivityLog";
 import TileManager from "./TileManager";
+import DiceRollModal from "./DiceRollModal";
 
 export default function GameBoard({
   G,
@@ -17,6 +18,8 @@ export default function GameBoard({
   const [showCardEditor, setShowCardEditor] = useState(false);
   const [showCardManager, setShowCardManager] = useState(false);
   const [showTileManager, setShowTileManager] = useState(false);
+  const [showDiceRoll, setShowDiceRoll] = useState(false);
+  const [isRolling, setIsRolling] = useState(false);
   const [editingCard, setEditingCard] = useState<ActionCard | undefined>(
     undefined
   );
@@ -47,7 +50,9 @@ export default function GameBoard({
   };
 
   const handleRollDice = () => {
-    if (isMyTurn && (G.phase === "playing" || G.phase === "setup")) {
+    if (isMyTurn && (G.phase === "playing" || G.phase === "setup") && !isRolling) {
+      setIsRolling(true);
+      setShowDiceRoll(true);
       moves.rollDice();
       // Auto-transition to playing if in setup
       if (G.phase === "setup" && events.setPhase) {
@@ -55,6 +60,13 @@ export default function GameBoard({
       }
     }
   };
+
+  useEffect(() => {
+    // Show dice roll modal when a roll happens
+    if (G.lastRoll && isMyTurn) {
+      setShowDiceRoll(true);
+    }
+  }, [G.lastRoll, isMyTurn]);
 
   const handleMove = () => {
     if (
@@ -73,7 +85,12 @@ export default function GameBoard({
       // for tiles with linked actionCardId. For other tile types, we still
       // need to manually draw actions.
       const landedTile = G.boardTiles[newPosition];
-
+      
+      // Show tile instruction if available
+      if (landedTile.specialEffect) {
+        // The instruction will be shown in the action modal or we can show it here
+      }
+      
       // Only manually draw if tile doesn't have a linked action card
       // (movePawn handles tiles with actionCardId automatically)
       if (!landedTile.actionCardId) {
@@ -122,11 +139,6 @@ export default function GameBoard({
     alert("Game paused. Safe word activated. All players can take a break.");
   };
 
-  const handleCategorySelect = (category: CardCategory) => {
-    if (moves.drawAction) {
-      moves.drawAction(category);
-    }
-  };
 
   // Show start game button if in setup phase, but also show it alongside turn controls
   const showStartButton = G.phase === "setup";
@@ -215,186 +227,196 @@ export default function GameBoard({
         </div>
       )}
 
-      {/* Turn Controls - Always Show When It's Your Turn OR if it's the first player's turn */}
-      <div className="mb-6">
-        {/* Show controls if it's your turn OR if it's player 0's turn and we're player 0 (fallback for solo/local play) */}
-        {isMyTurn ||
+      {/* Prominent Dice Roll Button - Always visible when it's your turn */}
+      {(isMyTurn ||
         (typeof ctx.currentPlayer === "number" &&
           ctx.currentPlayer === 0 &&
-          playerIDNum === 0) ? (
-          <div className="space-y-4">
-            {/* Roll Dice Button - Show if no roll yet */}
-            {!G.lastRoll && (
-              <div className="bg-gray-800/50 rounded-xl p-6 border border-purple-500/30">
-                <h3 className="text-white font-semibold mb-4">
-                  Step 1: Roll the Dice
-                </h3>
-                <button
-                  onClick={handleRollDice}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
-                >
-                  🎲 Roll Dice (2 dice = 2-12)
-                </button>
-                <p className="text-gray-400 text-sm mt-2 text-center">
-                  Click to roll two dice and see how many spaces you can move
-                </p>
-              </div>
-            )}
+          playerIDNum === 0)) && (
+        <div className="mb-6 flex justify-center">
+          {!G.lastRoll ? (
+            <button
+              onClick={handleRollDice}
+              disabled={isRolling}
+              className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-12 py-6 rounded-2xl transition-all transform hover:scale-110 active:scale-95 font-bold text-2xl shadow-2xl border-4 border-white/20 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse"
+            >
+              <span className="flex items-center gap-3">
+                <span className={`text-4xl ${isRolling ? 'animate-spin' : ''}`}>🎲</span>
+                <span>Roll Dice</span>
+              </span>
+            </button>
+          ) : (
+            <button
+              onClick={handleMove}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-6 rounded-2xl transition-all transform hover:scale-110 active:scale-95 font-bold text-2xl shadow-2xl border-4 border-white/20"
+            >
+              <span className="flex items-center gap-3">
+                <span>👉</span>
+                <span>Move {G.lastRoll} Spaces</span>
+              </span>
+            </button>
+          )}
+        </div>
+      )}
 
-            {/* Move Button - Show if rolled but not moved */}
-            {G.lastRoll && (
-              <div className="bg-gray-800/50 rounded-xl p-6 border border-blue-500/30">
-                <h3 className="text-white font-semibold mb-4">
-                  Step 2: Move Your Pawn
-                </h3>
-                <button
-                  onClick={handleMove}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
-                >
-                  👉 Move {G.lastRoll} Spaces
-                </button>
-                <p className="text-gray-400 text-sm mt-2 text-center">
-                  Click to move your pawn {G.lastRoll} spaces forward on the
-                  board
-                </p>
-              </div>
-            )}
-
-            {/* Category Selection (Optional) */}
-            {!G.lastRoll && (
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-600">
-                <h3 className="text-white font-semibold mb-3 text-sm">
-                  Or Choose a Category:
-                </h3>
-                <div className="flex gap-2 flex-wrap">
-                  <button
-                    onClick={() => handleCategorySelect("truth")}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    💭 Truth
-                  </button>
-                  <button
-                    onClick={() => handleCategorySelect("dare")}
-                    className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    🎯 Dare
-                  </button>
-                  <button
-                    onClick={() => handleCategorySelect("challenge")}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    ⚡ Challenge
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingCard(undefined);
-                      setShowCardEditor(true);
-                    }}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    ➕ Add Card
-                  </button>
-                  <button
-                    onClick={() => setShowCardManager(true)}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    📋 My Cards ({customCards.length})
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-600 text-center">
-            <p className="text-gray-400 text-lg mb-2">
-              Waiting for Player {ctx.currentPlayer + 1} to take their turn...
-            </p>
-            <p className="text-gray-500 text-sm">
-              When it's your turn, action buttons will appear here
-            </p>
-          </div>
-        )}
-      </div>
+      {/* Waiting Message for Other Players */}
+      {!(isMyTurn ||
+        (typeof ctx.currentPlayer === "number" &&
+          ctx.currentPlayer === 0 &&
+          playerIDNum === 0)) && (
+        <div className="mb-6 bg-gray-800/50 rounded-xl p-6 border border-gray-600 text-center">
+          <p className="text-gray-400 text-lg mb-2">
+            Waiting for Player {ctx.currentPlayer + 1} to take their turn...
+          </p>
+          <p className="text-gray-500 text-sm">
+            When it's your turn, the dice roll button will appear here
+          </p>
+        </div>
+      )}
 
       {/* Board and Activity Log Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-        {/* Linear Board */}
-        <div className="lg:col-span-3 relative bg-gray-900/50 rounded-xl p-6 border-2 border-purple-500/30 overflow-x-auto">
-        <div className="flex items-center gap-2 min-w-max" style={{ width: `${G.boardSize * 60}px` }}>
-          {G.boardTiles.map((tile, idx) => {
-            const isOccupied = G.players.some(p => p.position === tile.position);
-            const playersOnTile = G.players.filter(p => p.position === tile.position);
-
-            return (
-              <div key={tile.id} className="relative flex-shrink-0">
-                {/* Tile */}
-                <div
-                  className={`w-14 h-14 rounded-lg border-2 flex items-center justify-center font-bold text-xs transition-all ${
-                    tile.type === "start"
-                      ? "bg-green-600 border-green-400 text-white"
-                      : tile.type === "finish"
-                      ? "bg-red-600 border-red-400 text-white"
-                      : tile.type === "action"
-                      ? "bg-purple-600 border-purple-400 text-white"
-                      : tile.type === "punishment"
-                      ? "bg-orange-600 border-orange-400 text-white"
-                      : tile.type === "reward"
-                      ? "bg-green-500 border-green-300 text-white"
-                      : tile.type === "wild"
-                      ? "bg-pink-600 border-pink-400 text-white"
-                      : "bg-gray-600 border-gray-400 text-white"
-                  } ${isOccupied ? "ring-2 ring-yellow-400 ring-offset-2" : ""}`}
-                  title={
-                    tile.type === "start"
-                      ? "START"
-                      : tile.type === "finish"
-                      ? "FINISH"
-                      : `#${tile.position + 1}: ${tile.type.charAt(0).toUpperCase() + tile.type.slice(1)}${tile.specialEffect ? ` - ${tile.specialEffect}` : ""}`
-                  }
-                >
-                  {tile.type === "start" ? (
-                    <span className="text-xs">START</span>
-                  ) : tile.type === "finish" ? (
-                    <span className="text-xs">END</span>
-                  ) : (
-                    <span>{tile.position + 1}</span>
-                  )}
-                </div>
-
-                {/* Player Pawns on Tile */}
-                {playersOnTile.length > 0 && (
-                  <div className="absolute -top-2 -right-2 flex gap-1">
-                    {playersOnTile.map((player) => (
-                      <div
-                        key={player.id}
-                        className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold"
-                        style={{ backgroundColor: player.color }}
-                        title={`${player.name} - Position: ${player.position}`}
-                      >
-                        {G.players.findIndex(p => p.id === player.id) + 1}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Arrow between tiles (except last) */}
-                {idx < G.boardTiles.length - 1 && (
-                  <div className="absolute top-1/2 -right-3 transform -translate-y-1/2">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M9 18L15 12L9 6"
-                        stroke="#7C3AED"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        {/* Shaped Board - Snake/Winding Path */}
+        <div className="lg:col-span-3 relative bg-gray-900/50 rounded-xl p-8 border-2 border-purple-500/30 overflow-auto">
+          <svg viewBox="0 0 1000 600" className="w-full h-auto min-h-[400px]">
+            {/* Draw winding snake path */}
+            <path
+              d="M 50 300 L 200 300 L 200 150 L 400 150 L 400 300 L 600 300 L 600 150 L 800 150 L 800 300 L 950 300"
+              fill="none"
+              stroke="#7C3AED"
+              strokeWidth="8"
+              strokeOpacity="0.3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            
+            {/* Board tiles positioned along the path */}
+            {G.boardTiles.map((tile) => {
+              const progress = tile.position / (G.boardSize - 1);
+              let x = 50;
+              let y = 300;
+              
+              // Calculate position along winding path
+              if (progress < 0.15) {
+                // First straight section
+                x = 50 + (progress / 0.15) * 150;
+                y = 300;
+              } else if (progress < 0.3) {
+                // First turn up
+                x = 200;
+                y = 300 - ((progress - 0.15) / 0.15) * 150;
+              } else if (progress < 0.5) {
+                // Second straight section
+                x = 200 + ((progress - 0.3) / 0.2) * 200;
+                y = 150;
+              } else if (progress < 0.65) {
+                // Second turn down
+                x = 400;
+                y = 150 + ((progress - 0.5) / 0.15) * 150;
+              } else if (progress < 0.8) {
+                // Third straight section
+                x = 400 + ((progress - 0.65) / 0.15) * 200;
+                y = 300;
+              } else if (progress < 0.95) {
+                // Third turn up
+                x = 600;
+                y = 300 - ((progress - 0.8) / 0.15) * 150;
+              } else {
+                // Final sections
+                const finalProgress = (progress - 0.95) / 0.05;
+                if (finalProgress < 0.5) {
+                  x = 600 + (finalProgress / 0.5) * 200;
+                  y = 150;
+                } else {
+                  x = 800;
+                  y = 150 + ((finalProgress - 0.5) / 0.5) * 150;
+                }
+              }
+              
+              const isOccupied = G.players.some(p => p.position === tile.position);
+              const playersOnTile = G.players.filter(p => p.position === tile.position);
+              
+              const getTileColor = () => {
+                switch (tile.type) {
+                  case "start": return "#10B981";
+                  case "finish": return "#EF4444";
+                  case "action": return "#8B5CF6";
+                  case "punishment": return "#F59E0B";
+                  case "reward": return "#10B981";
+                  case "wild": return "#EC4899";
+                  default: return "#4B5563";
+                }
+              };
+              
+              return (
+                <g key={tile.id}>
+                  {/* Tile circle */}
+                  <circle
+                    cx={x}
+                    cy={y}
+                    r="20"
+                    fill={getTileColor()}
+                    stroke={isOccupied ? "#FCD34D" : "#7C3AED"}
+                    strokeWidth={isOccupied ? "4" : "2"}
+                    strokeOpacity="0.8"
+                    className="transition-all hover:scale-125 cursor-pointer"
+                  >
+                    <title>
+                      {tile.type === "start"
+                        ? "START"
+                        : tile.type === "finish"
+                        ? "FINISH"
+                        : `#${tile.position + 1}: ${tile.type.charAt(0).toUpperCase() + tile.type.slice(1)}${tile.specialEffect ? ` - ${tile.specialEffect}` : ""}`}
+                    </title>
+                  </circle>
+                  
+                  {/* Tile number/label */}
+                  <text
+                    x={x}
+                    y={y + 5}
+                    textAnchor="middle"
+                    fill="white"
+                    fontSize="12"
+                    fontWeight="bold"
+                    className="pointer-events-none"
+                  >
+                    {tile.type === "start" ? "S" : tile.type === "finish" ? "F" : tile.position + 1}
+                  </text>
+                  
+                  {/* Player pawns */}
+                  {playersOnTile.map((player, pIdx) => {
+                    const offsetAngle = (pIdx - (playersOnTile.length - 1) / 2) * 0.5;
+                    const pawnX = x + Math.cos(offsetAngle) * 15;
+                    const pawnY = y + Math.sin(offsetAngle) * 15;
+                    
+                    return (
+                      <g key={player.id}>
+                        <circle
+                          cx={pawnX}
+                          cy={pawnY}
+                          r="8"
+                          fill={player.color}
+                          stroke="white"
+                          strokeWidth="2"
+                        >
+                          <title>{player.name} - Position: {player.position}</title>
+                        </circle>
+                        <text
+                          x={pawnX}
+                          y={pawnY + 3}
+                          textAnchor="middle"
+                          fill="white"
+                          fontSize="8"
+                          fontWeight="bold"
+                        >
+                          {G.players.findIndex(p => p.id === player.id) + 1}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </g>
+              );
+            })}
+          </svg>
         </div>
 
         {/* Activity Log */}
@@ -489,6 +511,24 @@ export default function GameBoard({
           🛑 Safe Word (Pause Game)
         </button>
       </div>
+
+      {/* Dice Roll Modal */}
+      {showDiceRoll && G.lastRoll && (
+        <DiceRollModal
+          roll={G.lastRoll}
+          die1={G.activityLog?.find(e => e.type === "roll" && e.data?.roll === G.lastRoll)?.data?.die1}
+          die2={G.activityLog?.find(e => e.type === "roll" && e.data?.roll === G.lastRoll)?.data?.die2}
+          tileInstruction={
+            G.lastRoll && G.players[ctx.currentPlayer]
+              ? G.boardTiles[Math.min(G.players[ctx.currentPlayer].position + G.lastRoll, G.boardSize - 1)]?.specialEffect
+              : undefined
+          }
+          onClose={() => {
+            setShowDiceRoll(false);
+            setIsRolling(false);
+          }}
+        />
+      )}
 
       {/* Action Modal */}
       {showActionModal && G.currentAction && (
