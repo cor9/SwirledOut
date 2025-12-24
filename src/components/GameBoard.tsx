@@ -26,7 +26,7 @@ export default function GameBoard({
   const playerIDNum = playerID ? parseInt(playerID, 10) : 0;
   const currentPlayerNum = typeof ctx.currentPlayer === "number" ? ctx.currentPlayer : parseInt(String(ctx.currentPlayer || "0"), 10);
   const isMyTurn = currentPlayerNum === playerIDNum;
-  
+
   // In solo mode, always allow player 0 to take actions
   const isSoloMode = typeof ctx.numPlayers === "number" && ctx.numPlayers === 1;
   const canTakeTurn = isMyTurn || (isSoloMode && currentPlayerNum === 0);
@@ -54,9 +54,9 @@ export default function GameBoard({
   };
 
   const handleRollDice = () => {
-    if (canTakeTurn && (G.phase === "playing" || G.phase === "setup") && !isRolling) {
+    // Prevent multiple rolls - only roll if we haven't rolled yet and aren't currently rolling
+    if (canTakeTurn && (G.phase === "playing" || G.phase === "setup") && !isRolling && !G.lastRoll) {
       setIsRolling(true);
-      setShowDiceRoll(true);
       moves.rollDice();
       // Auto-transition to playing if in setup
       if (G.phase === "setup" && events.setPhase) {
@@ -66,11 +66,16 @@ export default function GameBoard({
   };
 
   useEffect(() => {
-    // Show dice roll modal when a roll happens
-    if (G.lastRoll && canTakeTurn) {
+    // Show dice roll modal when a roll happens, but only once per roll
+    if (G.lastRoll && canTakeTurn && isRolling && !showDiceRoll) {
       setShowDiceRoll(true);
     }
-  }, [G.lastRoll, canTakeTurn]);
+    // Reset isRolling if we no longer have a roll (turn ended)
+    if (!G.lastRoll && isRolling) {
+      setIsRolling(false);
+      setShowDiceRoll(false);
+    }
+  }, [G.lastRoll, canTakeTurn, isRolling, showDiceRoll]);
 
   const handleMove = () => {
     if (
@@ -235,9 +240,9 @@ export default function GameBoard({
       )}
 
       {/* Prominent Dice Roll Button - Always visible when it's your turn and game has started */}
-      {!showStartButton && canTakeTurn && (
+      {!showStartButton && canTakeTurn && !showDiceRoll && (
         <div className="mb-6 flex justify-center">
-          {!G.lastRoll ? (
+          {!G.lastRoll && !isRolling ? (
             <button
               onClick={handleRollDice}
               disabled={isRolling}
@@ -248,7 +253,7 @@ export default function GameBoard({
                 <span>Roll Dice</span>
               </span>
             </button>
-          ) : (
+          ) : G.lastRoll && !isRolling ? (
             <button
               onClick={handleMove}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-6 rounded-2xl transition-all transform hover:scale-110 active:scale-95 font-bold text-2xl shadow-2xl border-4 border-white/20"
@@ -258,7 +263,7 @@ export default function GameBoard({
                 <span>Move {G.lastRoll} Spaces</span>
               </span>
             </button>
-          )}
+          ) : null}
         </div>
       )}
 
@@ -527,6 +532,7 @@ export default function GameBoard({
           onClose={() => {
             setShowDiceRoll(false);
             setIsRolling(false);
+            // Reset the roll state so we can roll again next turn
           }}
         />
       )}
