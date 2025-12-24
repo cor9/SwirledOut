@@ -140,7 +140,7 @@ export default function GameBoard({
   };
 
 
-  // Show start game button if in setup phase, but also show it alongside turn controls
+  // Show start game button if in setup phase
   const showStartButton = G.phase === "setup";
 
   return (
@@ -209,26 +209,29 @@ export default function GameBoard({
         </div>
       </div>
 
+
       {/* Start Game Button - Show if in setup phase */}
       {showStartButton && (
-        <div className="mb-6 bg-gray-800/50 rounded-xl p-6 border border-purple-500/30 text-center">
-          <h3 className="text-2xl font-bold text-white mb-3">
-            🎮 Ready to Play?
-          </h3>
-          <p className="text-gray-300 mb-4">
-            Click the button below to start the game!
-          </p>
-          <button
-            onClick={handleStartGame}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
-          >
-            🚀 Start Game
-          </button>
+        <div className="mb-6 flex justify-center">
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-purple-500/30 text-center max-w-md">
+            <h3 className="text-2xl font-bold text-white mb-3">
+              🎮 Ready to Play?
+            </h3>
+            <p className="text-gray-300 mb-4">
+              Click the button below to start the game!
+            </p>
+            <button
+              onClick={handleStartGame}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-bold text-xl shadow-lg"
+            >
+              🚀 Start Game
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Prominent Dice Roll Button - Always visible when it's your turn */}
-      {(isMyTurn ||
+      {/* Prominent Dice Roll Button - Always visible when it's your turn and game has started */}
+      {!showStartButton && (isMyTurn ||
         (typeof ctx.currentPlayer === "number" &&
           ctx.currentPlayer === 0 &&
           playerIDNum === 0)) && (
@@ -277,14 +280,14 @@ export default function GameBoard({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
         {/* Shaped Board - Snake/Winding Path */}
         <div className="lg:col-span-3 relative bg-gray-900/50 rounded-xl p-8 border-2 border-purple-500/30 overflow-auto">
-          <svg viewBox="0 0 1000 600" className="w-full h-auto min-h-[400px]">
-            {/* Draw winding snake path */}
+          <svg viewBox="0 0 1000 600" className="w-full h-auto min-h-[600px]">
+            {/* Draw winding snake path - Thicker and more visible */}
             <path
               d="M 50 300 L 200 300 L 200 150 L 400 150 L 400 300 L 600 300 L 600 150 L 800 150 L 800 300 L 950 300"
               fill="none"
               stroke="#7C3AED"
-              strokeWidth="8"
-              strokeOpacity="0.3"
+              strokeWidth="12"
+              strokeOpacity="0.4"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -349,16 +352,16 @@ export default function GameBoard({
 
               return (
                 <g key={tile.id}>
-                  {/* Tile circle */}
+                  {/* Tile circle - Larger and no hover scale to prevent blinking */}
                   <circle
                     cx={x}
                     cy={y}
-                    r="20"
+                    r="35"
                     fill={getTileColor()}
                     stroke={isOccupied ? "#FCD34D" : "#7C3AED"}
-                    strokeWidth={isOccupied ? "4" : "2"}
-                    strokeOpacity="0.8"
-                    className="transition-all hover:scale-125 cursor-pointer"
+                    strokeWidth={isOccupied ? "5" : "3"}
+                    strokeOpacity="0.9"
+                    className="transition-opacity hover:opacity-80 cursor-pointer"
                   >
                     <title>
                       {tile.type === "start"
@@ -368,44 +371,44 @@ export default function GameBoard({
                         : `#${tile.position + 1}: ${tile.type.charAt(0).toUpperCase() + tile.type.slice(1)}${tile.specialEffect ? ` - ${tile.specialEffect}` : ""}`}
                     </title>
                   </circle>
-
-                  {/* Tile number/label */}
+                  
+                  {/* Tile number/label - Larger text */}
                   <text
                     x={x}
-                    y={y + 5}
+                    y={y + 8}
                     textAnchor="middle"
                     fill="white"
-                    fontSize="12"
+                    fontSize="18"
                     fontWeight="bold"
                     className="pointer-events-none"
                   >
-                    {tile.type === "start" ? "S" : tile.type === "finish" ? "F" : tile.position + 1}
+                    {tile.type === "start" ? "START" : tile.type === "finish" ? "FINISH" : tile.position + 1}
                   </text>
 
-                  {/* Player pawns */}
+                  {/* Player pawns - Larger */}
                   {playersOnTile.map((player, pIdx) => {
-                    const offsetAngle = (pIdx - (playersOnTile.length - 1) / 2) * 0.5;
-                    const pawnX = x + Math.cos(offsetAngle) * 15;
-                    const pawnY = y + Math.sin(offsetAngle) * 15;
-
+                    const offsetAngle = (pIdx - (playersOnTile.length - 1) / 2) * 0.6;
+                    const pawnX = x + Math.cos(offsetAngle) * 25;
+                    const pawnY = y + Math.sin(offsetAngle) * 25;
+                    
                     return (
                       <g key={player.id}>
                         <circle
                           cx={pawnX}
                           cy={pawnY}
-                          r="8"
+                          r="12"
                           fill={player.color}
                           stroke="white"
-                          strokeWidth="2"
+                          strokeWidth="3"
                         >
                           <title>{player.name} - Position: {player.position}</title>
                         </circle>
                         <text
                           x={pawnX}
-                          y={pawnY + 3}
+                          y={pawnY + 4}
                           textAnchor="middle"
                           fill="white"
-                          fontSize="8"
+                          fontSize="10"
                           fontWeight="bold"
                         >
                           {G.players.findIndex(p => p.id === player.id) + 1}
